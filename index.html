@@ -556,60 +556,6 @@ applyTranslations(currentLang);
 updateStats();
 
 </script>
-<!-- Lightweight Browser Translation Notice (Option 1) -->
-<style>
-#browserTranslateTip {
-  position: fixed;
-  bottom: 15px;
-  right: 15px;
-  background: #007bff;
-  color: white;
-  padding: 10px 15px;
-  font-size: 14px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  z-index: 9999;
-}
-#browserTranslateTip select {
-  background: white;
-  color: #000;
-  border-radius: 5px;
-  border: none;
-  padding: 3px 6px;
-  margin-left: 5px;
-}
-</style>
-
-<div id="browserTranslateTip">
-  🌐 Translate Page:
-  <select id="browserLangSelect">
-    <option value="">Choose language</option>
-    <option value="hi">Hindi</option>
-    <option value="mr">Marathi</option>
-    <option value="bn">Bengali</option>
-    <option value="ta">Tamil</option>
-    <option value="te">Telugu</option>
-    <option value="gu">Gujarati</option>
-    <option value="pa">Punjabi</option>
-    <option value="kn">Kannada</option>
-    <option value="ml">Malayalam</option>
-    <option value="ur">Urdu</option>
-  </select>
-  <div style="font-size:12px;margin-top:3px;">Right-click → Translate</div>
-</div>
-
-<script>
-document.getElementById("browserLangSelect").addEventListener("change", function(){
-  if(!this.value) return;
-
-  alert(
-    "To translate:\n\n" +
-    "1. Right-click anywhere on the page\n" +
-    "2. Click 'Translate to " + this.value + "'\n" +
-    "\nThis works in Chrome, Edge, Opera, Brave."
-  );
-});
-</script>
-
 </body>
 </html>
+
