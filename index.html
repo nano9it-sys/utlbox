@@ -136,161 +136,21 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   </div>
 </div>
 
-<!-- keep libs for download/export -->
+<!-- Google Translate hidden container -->
+<div id="google_translate_element" style="display:none;"></div>
+
+<!-- libs -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
 // ----------------------
-// TRANSLATIONS (local)
+// Local translations
 // ----------------------
 const translations = {
-  "en": {
-    headerTitle: "Sentence Case Character Counter",
-    placeholder: "Type your text here...",
-    clearBtn: "Clear",
-    copyBtn: "Copy",
-    copyTooltip: "Copied!",
-    downloadBtn: "Download",
-    darkLabel: "Dark",
-    caseOptions: {
-      sentence: "Sentence case",
-      lower: "lowercase",
-      upper: "UPPERCASE",
-      capital: "Capitalize Each Word",
-      toggle: "tOGGLE cASE"
-    },
-    downloadOptions: { txt:"Text (.txt)", pdf:"PDF (.pdf)", doc:"Word (.docx)", xlsx:"Excel (.xlsx)" },
-    stats: { chars:"CHARS", words:"WORDS", sent:"SENTENCES", para:"PARA", space:"SPACES" },
-    dupLabel: "Duplicate Words Count:",
-    dupTable: { word:"Word", count:"Count", nodups:"No duplicates" }
-  },
-  "es": {
-    headerTitle: "Contador de Caracteres (Mayúsculas de Oración)",
-    placeholder: "Escribe tu texto aquí...",
-    clearBtn: "Limpiar",
-    copyBtn: "Copiar",
-    copyTooltip: "¡Copiado!",
-    downloadBtn: "Descargar",
-    darkLabel: "Oscuro",
-    caseOptions: { sentence:"Oración", lower:"minúsculas", upper:"MAYÚSCULAS", capital:"Capitalizar Cada Palabra", toggle:"cAMBIO dE mAYÚSCULAS" },
-    downloadOptions: { txt:"Texto (.txt)", pdf:"PDF (.pdf)", doc:"Word (.docx)", xlsx:"Excel (.xlsx)" },
-    stats: { chars:"CAR", words:"PALABRAS", sent:"ORACIONES", para:"PÁRRAFOS", space:"ESPACIOS" },
-    dupLabel: "Cantidad de Palabras Duplicadas:",
-    dupTable: { word:"Palabra", count:"Cuenta", nodups:"Sin duplicados" }
-  },
-  "fr": {
-    headerTitle: "Compteur de Caractères (Casse Phrase)",
-    placeholder: "Tapez votre texte ici...",
-    clearBtn: "Effacer",
-    copyBtn: "Copier",
-    copyTooltip: "Copié !",
-    downloadBtn: "Télécharger",
-    darkLabel: "Sombre",
-    caseOptions: { sentence:"Casse phrase", lower:"minuscules", upper:"MAJUSCULES", capital:"Mettre en majuscule chaque mot", toggle:"mODIFIER lA cASSE" },
-    downloadOptions: { txt:"Texte (.txt)", pdf:"PDF (.pdf)", doc:"Word (.docx)", xlsx:"Excel (.xlsx)" },
-    stats: { chars:"CAR", words:"MOTS", sent:"PHRASES", para:"PARA", space:"ESPACES" },
-    dupLabel: "Nombre de Mots Dupliqués:",
-    dupTable: { word:"Mot", count:"Nombre", nodups:"Pas de doublons" }
-  },
-  "de": {
-    headerTitle: "Zeichenzähler (Satzfall)",
-    placeholder: "Geben Sie hier Ihren Text ein...",
-    clearBtn: "Löschen",
-    copyBtn: "Kopieren",
-    copyTooltip: "Kopiert!",
-    downloadBtn: "Herunterladen",
-    darkLabel: "Dunkel",
-    caseOptions: { sentence:"Satzfall", lower:"kleinschreibung", upper:"GROSSSCHREIBUNG", capital:"Jedes Wort großschreiben", toggle:"Wechseln Fall" },
-    downloadOptions: { txt:"Text (.txt)", pdf:"PDF (.pdf)", doc:"Word (.docx)", xlsx:"Excel (.xlsx)" },
-    stats: { chars:"ZEICH", words:"WÖRTER", sent:"SÄTZE", para:"ABS", space:"LEERRÄUME" },
-    dupLabel: "Anzahl doppelter Wörter:",
-    dupTable: { word:"Wort", count:"Anzahl", nodups:"Keine Duplikate" }
-  },
-  "hi": {
-    headerTitle: "वाक्य केस कैरेक्टर काउंटर",
-    placeholder: "अपना पाठ यहाँ टाइप करें...",
-    clearBtn: "साफ़ करें",
-    copyBtn: "कॉपी",
-    copyTooltip: "कॉपी किया!",
-    downloadBtn: "डाउनलोड",
-    darkLabel: "डार्क",
-    caseOptions: { sentence:"वाक्य केस", lower:"छोटे अक्षर", upper:"बड़े अक्षर", capital:"प्रत्येक शब्द को बड़ा करें", toggle:"टॉगल केस" },
-    downloadOptions: { txt:"टेक्स्ट (.txt)", pdf:"PDF (.pdf)", doc:"Word (.docx)", xlsx:"Excel (.xlsx)" },
-    stats: { chars:"अक्षर", words:"शब्द", sent:"वाक्य", para:"पैर्रा", space:"स्पेस" },
-    dupLabel: "डुप्लिकेट शब्दों की संख्या:",
-    dupTable: { word:"शब्द", count:"गिनती", nodups:"कोई डुप्लिकेट नहीं" }
-  },
-  "zh-CN": {
-    headerTitle: "句子大小写字符计数器",
-    placeholder: "在此处输入文本...",
-    clearBtn: "清除",
-    copyBtn: "复制",
-    copyTooltip: "已复制！",
-    downloadBtn: "下载",
-    darkLabel: "深色",
-    caseOptions: { sentence:"句子大小写", lower:"小写", upper:"大写", capital:"每词首字母大写", toggle:"切换大小写" },
-    downloadOptions: { txt:"文本 (.txt)", pdf:"PDF (.pdf)", doc:"Word (.docx)", xlsx:"Excel (.xlsx)" },
-    stats: { chars:"字符", words:"单词", sent:"句子", para:"段落", space:"空格" },
-    dupLabel: "重复词计数：",
-    dupTable: { word:"单词", count:"次数", nodups:"无重复" }
-  },
-  "ja": {
-    headerTitle: "文頭大文字カウンター",
-    placeholder: "ここにテキストを入力してください...",
-    clearBtn: "クリア",
-    copyBtn: "コピー",
-    copyTooltip: "コピーしました！",
-    downloadBtn: "ダウンロード",
-    darkLabel: "ダーク",
-    caseOptions: { sentence:"文頭大文字", lower:"小文字", upper:"大文字", capital:"単語ごとに大文字", toggle:"ケース切替" },
-    downloadOptions: { txt:"テキスト (.txt)", pdf:"PDF (.pdf)", doc:"Word (.docx)", xlsx:"Excel (.xlsx)" },
-    stats: { chars:"文字", words:"単語", sent:"文", para:"段落", space:"スペース" },
-    dupLabel: "重複単語数：",
-    dupTable: { word:"単語", count:"回数", nodups:"重複なし" }
-  },
-  "ru": {
-    headerTitle: "Счётчик символов (речение)",
-    placeholder: "Введите текст здесь...",
-    clearBtn: "Очистить",
-    copyBtn: "Копировать",
-    copyTooltip: "Скопировано!",
-    downloadBtn: "Скачать",
-    darkLabel: "Тёмный",
-    caseOptions: { sentence:"Реч. регистр", lower:"строчные", upper:"ЗАГЛАВНЫЕ", capital:"Сделать каждое слово с заглавной", toggle:"переключить регистр" },
-    downloadOptions: { txt:"Текст (.txt)", pdf:"PDF (.pdf)", doc:"Word (.docx)", xlsx:"Excel (.xlsx)" },
-    stats: { chars:"СИМВ", words:"СЛОВА", sent:"ПРЕДЛ", para:"ПАРА", space:"ПРОБЕЛЫ" },
-    dupLabel: "Количество повторяющихся слов:",
-    dupTable: { word:"Слово", count:"Количество", nodups:"Нет дубликатов" }
-  },
-  "ar": {
-    headerTitle: "عداد أحرف حالة الجملة",
-    placeholder: "اكتب النص هنا...",
-    clearBtn: "مسح",
-    copyBtn: "نسخ",
-    copyTooltip: "تم النسخ!",
-    downloadBtn: "تحميل",
-    darkLabel: "داكن",
-    caseOptions: { sentence:"حالة الجملة", lower:"أحرف صغيرة", upper:"أحرف كبيرة", capital:"تكبير كل كلمة", toggle:"تبديل الحالة" },
-    downloadOptions: { txt:"نص (.txt)", pdf:"PDF (.pdf)", doc:"Word (.docx)", xlsx:"Excel (.xlsx)" },
-    stats: { chars:"حروف", words:"كلمات", sent:"جمل", para:"فقرات", space:"مسافات" },
-    dupLabel: "عدد الكلمات المكررة:",
-    dupTable: { word:"كلمة", count:"العدد", nodups:"لا توجد تكرارات" }
-  },
-  "pt": {
-    headerTitle: "Contador de Caracteres (Caso de Sentença)",
-    placeholder: "Digite seu texto aqui...",
-    clearBtn: "Limpar",
-    copyBtn: "Copiar",
-    copyTooltip: "Copiado!",
-    downloadBtn: "Baixar",
-    darkLabel: "Escuro",
-    caseOptions: { sentence:"Caso de sentença", lower:"minúsculas", upper:"MAIÚSCULAS", capital:"Capitalizar Cada Palavra", toggle:"Alternar Caso" },
-    downloadOptions: { txt:"Texto (.txt)", pdf:"PDF (.pdf)", doc:"Word (.docx)", xlsx:"Excel (.xlsx)" },
-    stats: { chars:"CAR", words:"PALAVRAS", sent:"FRASES", para:"PARA", space:"ESPAÇOS" },
-    dupLabel: "Contagem de Palavras Duplicadas:",
-    dupTable: { word:"Palavra", count:"Contagem", nodups:"Sem duplicatas" }
-  }
+  "en": { headerTitle:"Sentence Case Character Counter", placeholder:"Type your text here...", clearBtn:"Clear", copyBtn:"Copy", copyTooltip:"Copied!", downloadBtn:"Download", darkLabel:"Dark", caseOptions:{sentence:"Sentence case",lower:"lowercase",upper:"UPPERCASE",capital:"Capitalize Each Word",toggle:"tOGGLE cASE"}, downloadOptions:{txt:"Text (.txt)",pdf:"PDF (.pdf)",doc:"Word (.docx)",xlsx:"Excel (.xlsx)"}, stats:{chars:"CHARS",words:"WORDS",sent:"SENTENCES",para:"PARA",space:"SPACES"}, dupLabel:"Duplicate Words Count:", dupTable:{word:"Word",count:"Count",nodups:"No duplicates"}},
+  "es": { headerTitle:"Contador de Caracteres (Mayúsculas de Oración)", placeholder:"Escribe tu texto aquí...", clearBtn:"Limpiar", copyBtn:"Copiar", copyTooltip:"¡Copiado!", downloadBtn:"Descargar", darkLabel:"Oscuro", caseOptions:{sentence:"Oración",lower:"minúsculas",upper:"MAYÚSCULAS",capital:"Capitalizar Cada Palabra",toggle:"cAMBIO dE mAYÚSCULAS"}, downloadOptions:{txt:"Texto (.txt)",pdf:"PDF (.pdf)",doc:"Word (.docx)",xlsx:"Excel (.xlsx)"}, stats:{chars:"CAR",words:"PALABRAS",sent:"ORACIONES",para:"PÁRRAFOS",space:"ESPACIOS"}, dupLabel:"Cantidad de Palabras Duplicadas:", dupTable:{word:"Palabra",count:"Cuenta",nodups:"Sin duplicados"}}
+  // ...add other languages here
 };
 
 // ----------------------
@@ -352,9 +212,7 @@ function updateStats(){ const t = txt.value;
 function highlightDuplicates(text){
   const words = text.toLowerCase().match(/\b\w+\b/g) || [];
   const counts = {}; words.forEach(w=>counts[w]=(counts[w]||0)+1);
-  let highlighted = text.replace(/\b\w+\b/g, word=>{
-    return counts[word.toLowerCase()]>1 ? `<mark style="background:yellow;color:black;">${word}</mark>` : word;
-  });
+  let highlighted = text.replace(/\b\w+\b/g, word=>{ return counts[word.toLowerCase()]>1 ? `<mark style="background:yellow;color:black;">${word}</mark>` : word; });
   highlighted = highlighted.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;');
   highlightLayer.innerHTML = highlighted;
 }
@@ -375,187 +233,75 @@ function updateDuplicates(text){
     });
   } else {
     const tr = document.createElement("tr");
-    const td = document.createElement("td"); td.colSpan = 2; td.textContent = translations[currentLang] ? translations[currentLang].dupTable.nodups : "No duplicates";
+    const td = document.createElement("td"); td.colSpan = 2; td.textContent = translations[currentLang].dupTable.nodups;
     tr.appendChild(td); dup_table.appendChild(tr);
   }
   highlightDuplicates(text);
 }
 
 // ----------------------
-// Events
+// Event listeners
 // ----------------------
-sel.addEventListener("change", ()=>{
-  const s = txt.selectionStart, e = txt.selectionEnd;
-  txt.value = applyCase(txt.value);
-  txt.setSelectionRange(s,e);
-  updateStats();
-});
-txt.addEventListener("input", ()=>{
-  const s = txt.selectionStart, e = txt.selectionEnd;
-  if(sel.value === "sentence"){
-    const updated = applyCase(txt.value);
-    if(updated !== txt.value){
-      txt.value = updated;
-      txt.setSelectionRange(s,e);
-    }
-  }
-  updateStats();
-});
-txt.addEventListener("compositionstart", ()=>composing=true);
-txt.addEventListener("compositionend", ()=>composing=false);
-document.getElementById("clearBtn").addEventListener("click", ()=>{ txt.value = ""; updateStats(); });
-
-// COPY
-copyBtn.addEventListener("click", () => {
-  const textToCopy = txt.value;
-  navigator.clipboard.writeText(textToCopy).then(() => {
-    const rect = copyBtn.getBoundingClientRect();
-    copyTooltip.style.top = rect.top - 35 + window.scrollY + "px";
-    copyTooltip.style.left = rect.left + window.scrollX + "px";
-    copyTooltip.textContent = translations[currentLang] ? translations[currentLang].copyTooltip : "Copied!";
-    copyTooltip.classList.add("show");
-    setTimeout(() => { copyTooltip.classList.remove("show"); }, 2000);
-  }).catch(() => {
-    const temp = document.createElement("textarea");
-    temp.value = textToCopy;
-    document.body.appendChild(temp);
-    temp.select();
-    document.execCommand("copy");
-    document.body.removeChild(temp);
-
-    copyTooltip.style.top = copyBtn.getBoundingClientRect().top - 35 + window.scrollY + "px";
-    copyTooltip.style.left = copyBtn.getBoundingClientRect().left + window.scrollX + "px";
-    copyTooltip.textContent = translations[currentLang] ? translations[currentLang].copyTooltip : "Copied!";
-    copyTooltip.classList.add("show");
-    setTimeout(() => copyTooltip.classList.remove("show"), 2000);
-  });
-});
-
-// DOWNLOAD
-document.getElementById("downloadBtn").addEventListener("click", ()=>{
-  const text = txt.value;
-  const format = document.getElementById("downloadFormat").value;
-
-  if(format === "txt"){
-    const blob = new Blob([text], { type: "text/plain" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "text.txt";
-    a.click();
-  }
-  else if(format === "pdf"){
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 10;
-    const maxLineWidth = pageWidth - margin*2;
-    const lines = doc.splitTextToSize(text, maxLineWidth);
-    doc.text(lines, margin, 10);
-    doc.save("text.pdf");
-  }
-  else if(format === "doc"){
-    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
-      "xmlns:w='urn:schemas-microsoft-com:office:word' "+
-      "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Document</title></head><body>";
-    const footer = "</body></html>";
-    const blob = new Blob([header+text+footer], { type: "application/msword" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "text.doc";
-    a.click();
-  }
-  else if(format === "xlsx"){
-    const ws = XLSX.utils.aoa_to_sheet(text.split(/\r?\n/).map(line => [line]));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    XLSX.writeFile(wb, "text.xlsx");
-  }
-});
-
-// DARK MODE
+sel.addEventListener("change", ()=>{ txt.value=applyCase(txt.value); updateStats(); });
+txt.addEventListener("input", ()=>updateStats());
+clearBtn.addEventListener("click", ()=>{ txt.value=""; updateStats(); });
 darkToggle.addEventListener("change", ()=>{ if(darkToggle.checked) document.body.classList.add("dark"); else document.body.classList.remove("dark"); });
 
 // ----------------------
-// Translation system
+// Download & Copy
 // ----------------------
-let currentLang = localStorage.getItem('utl_lang') || detectInitialLang() || 'en';
+copyBtn.addEventListener("click", ()=>{
+  navigator.clipboard.writeText(txt.value);
+  copyTooltip.textContent = translations[currentLang].copyTooltip;
+  copyTooltip.classList.add("show");
+  setTimeout(()=>copyTooltip.classList.remove("show"),2000);
+});
+
+// ----------------------
+// Google Translate
+// ----------------------
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,es,fr,de,hi,zh-CN,ja,ru,ar,pt',layout:google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+}
+const gScript=document.createElement("script"); gScript.src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"; document.body.appendChild(gScript);
+
+// ----------------------
+// Language system
+// ----------------------
+let currentLang = localStorage.getItem('utl_lang')||'en';
 langSelectHeader.value = currentLang;
 
-function detectInitialLang(){
-  const nav = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage || 'en';
-  const map = { "en":"en","es":"es","fr":"fr","de":"de","hi":"hi","zh":"zh-CN","zh-CN":"zh-CN","ja":"ja","ru":"ru","ar":"ar","pt":"pt" };
-  for(const code of [nav, nav.split('-')[0]]){
-    if(map[code]) return map[code];
-  }
-  return 'en';
-}
-
 function applyTranslations(lang){
-  currentLang = translations[lang] ? lang : 'en';
-  localStorage.setItem('utl_lang', currentLang);
-
+  currentLang = translations[lang]?lang:'en';
+  localStorage.setItem('utl_lang',currentLang);
   const t = translations[currentLang];
 
-  // Header & placeholders
   headerTitle.textContent = t.headerTitle;
   txt.placeholder = t.placeholder;
-
-  // Buttons & labels
   clearBtn.textContent = t.clearBtn;
   copyBtn.textContent = t.copyBtn;
   downloadBtn.textContent = t.downloadBtn;
   darkLabelSpan.textContent = t.darkLabel;
+  const caseMap=t.caseOptions;
+  Array.from(sel.options).forEach(opt=>{ if(caseMap[opt.value]) opt.textContent=caseMap[opt.value]; });
+  Array.from(downloadFormat.options).forEach(opt=>{ if(t.downloadOptions[opt.value]) opt.textContent=t.downloadOptions[opt.value]; });
+  label_chars.childNodes[0]&&(label_chars.childNodes[0].nodeValue=t.stats.chars+" ");
+  label_words.childNodes[0]&&(label_words.childNodes[0].nodeValue=t.stats.words+" ");
+  label_sent.childNodes[0]&&(label_sent.childNodes[0].nodeValue=t.stats.sent+" ");
+  label_para.childNodes[0]&&(label_para.childNodes[0].nodeValue=t.stats.para+" ");
+  label_space.childNodes[0]&&(label_space.childNodes[0].nodeValue=t.stats.space+" ");
+  dupLabelSpan.childNodes[0]&&(dupLabelSpan.childNodes[0].nodeValue=t.dupLabel+" ");
+  dup_th_word.textContent=t.dupTable.word;
+  dup_th_count.textContent=t.dupTable.count;
+  copyTooltip.textContent=t.copyTooltip;
 
-  // Case select options (keep values same, only change labels)
-  const caseMap = t.caseOptions;
-  Array.from(sel.options).forEach(opt => {
-    if(caseMap[opt.value]) opt.textContent = caseMap[opt.value];
-  });
-
-  // Download format options
-  Array.from(downloadFormat.options).forEach(opt => {
-    if(t.downloadOptions[opt.value]) opt.textContent = t.downloadOptions[opt.value];
-  });
-
-  // Stats labels
-  label_chars.childNodes[0] && (label_chars.childNodes[0].nodeValue = t.stats.chars + " ");
-  label_words.childNodes[0] && (label_words.childNodes[0].nodeValue = t.stats.words + " ");
-  label_sent.childNodes[0] && (label_sent.childNodes[0].nodeValue = t.stats.sent + " ");
-  label_para.childNodes[0] && (label_para.childNodes[0].nodeValue = t.stats.para + " ");
-  label_space.childNodes[0] && (label_space.childNodes[0].nodeValue = t.stats.space + " ");
-
-  // Duplicates panel
-  dupLabelSpan.childNodes[0] && (dupLabelSpan.childNodes[0].nodeValue = t.dupLabel + " ");
-  dup_th_word.textContent = t.dupTable.word;
-  dup_th_count.textContent = t.dupTable.count;
-
-  // Tooltip text will be set when used
-  copyTooltip.textContent = t.copyTooltip;
-
-  // Update duplicate table message
-  const hasDups = (txt.value.toLowerCase().match(/\b\w+\b/g)||[]).some((v,i,arr)=> arr.indexOf(v)!==i);
-  if(!hasDups){
-    noDuplicatesText.textContent = t.dupTable.nodups;
-  }
-
-  // Update charBox suffix? keep English 'characters' for numeric clarity, but you can change if desired.
+  const select=document.querySelector(".goog-te-combo");
+  if(select){ select.value=lang; select.dispatchEvent(new Event('change')); }
 }
 
-// When user selects a language
-langSelectHeader.addEventListener("change", (e)=>{
-  const val = e.target.value;
-  applyTranslations(val);
-});
-
-// Apply initial translations on load
+langSelectHeader.addEventListener("change", (e)=>applyTranslations(e.target.value));
 applyTranslations(currentLang);
-
-// ----------------------
-// Init
-// ----------------------
 updateStats();
-
 </script>
 </body>
 </html>
-
