@@ -63,7 +63,7 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   opacity: 1;
 }
 
-/* Optional: Hide Google Translate widget but keep it initialized */
+/* Hide Google Translate widget */
 #google_translate_element { position:absolute; left:-9999px; top:0; }
 </style>
 </head>
@@ -186,10 +186,9 @@ const label_space = document.getElementById("label_space");
 const dupLabelSpan = document.getElementById("dupLabel");
 const dup_th_word = document.getElementById("dup_th_word");
 const dup_th_count = document.getElementById("dup_th_count");
-const noDuplicatesText = document.getElementById("noDuplicatesText");
 
 // ----------------------
-// Case functions
+// Case functions & Stats
 // ----------------------
 function sentenceCase(t){ t=t.toLowerCase(); return t.replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g,m=>m.toUpperCase()); }
 function lower(t){ return t.toLowerCase(); }
@@ -198,9 +197,6 @@ function capital(t){ return t.replace(/\b(\w)(\w*)/g,(_,a,b)=>a.toUpperCase()+b.
 function toggleCase(t){ return t.split("").map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join(""); }
 function applyCase(text){ switch(sel.value){ case"sentence":return sentenceCase(text); case"lower":return lower(text); case"upper":return upper(text); case"capital":return capital(text); case"toggle":return toggleCase(text);} return text; }
 
-// ----------------------
-// Stats & duplicates
-// ----------------------
 function updateStats(){ const t = txt.value;
   s_chars.textContent = t.length;
   s_words.textContent = t.trim() ? t.trim().split(/\s+/).length : 0;
@@ -249,9 +245,6 @@ txt.addEventListener("input", ()=>updateStats());
 clearBtn.addEventListener("click", ()=>{ txt.value=""; updateStats(); });
 darkToggle.addEventListener("change", ()=>{ if(darkToggle.checked) document.body.classList.add("dark"); else document.body.classList.remove("dark"); });
 
-// ----------------------
-// Download & Copy
-// ----------------------
 copyBtn.addEventListener("click", ()=>{
   navigator.clipboard.writeText(txt.value);
   copyTooltip.textContent = translations[currentLang].copyTooltip;
@@ -260,7 +253,7 @@ copyBtn.addEventListener("click", ()=>{
 });
 
 // ----------------------
-// Google Translate
+// Google Translate Integration
 // ----------------------
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({
@@ -277,7 +270,7 @@ function googleTranslateElementInit() {
 })();
 
 // ----------------------
-// Language system
+// Language system with automatic Google Translate
 // ----------------------
 let currentLang = localStorage.getItem('utl_lang')||'en';
 langSelectHeader.value = currentLang;
@@ -293,21 +286,34 @@ function applyTranslations(lang){
   copyBtn.textContent = t.copyBtn;
   downloadBtn.textContent = t.downloadBtn;
   darkLabelSpan.textContent = t.darkLabel;
+
   const caseMap=t.caseOptions;
   Array.from(sel.options).forEach(opt=>{ if(caseMap[opt.value]) opt.textContent=caseMap[opt.value]; });
   Array.from(downloadFormat.options).forEach(opt=>{ if(t.downloadOptions[opt.value]) opt.textContent=t.downloadOptions[opt.value]; });
+  
   label_chars.childNodes[0]&&(label_chars.childNodes[0].nodeValue=t.stats.chars+" ");
   label_words.childNodes[0]&&(label_words.childNodes[0].nodeValue=t.stats.words+" ");
   label_sent.childNodes[0]&&(label_sent.childNodes[0].nodeValue=t.stats.sent+" ");
   label_para.childNodes[0]&&(label_para.childNodes[0].nodeValue=t.stats.para+" ");
   label_space.childNodes[0]&&(label_space.childNodes[0].nodeValue=t.stats.space+" ");
+  
   dupLabelSpan.childNodes[0]&&(dupLabelSpan.childNodes[0].nodeValue=t.dupLabel+" ");
   dup_th_word.textContent=t.dupTable.word;
   dup_th_count.textContent=t.dupTable.count;
   copyTooltip.textContent=t.copyTooltip;
+
+  // Trigger Google Translate
+  const select = document.querySelector(".goog-te-combo");
+  if(select){
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
 }
 
-langSelectHeader.addEventListener("change", (e)=>applyTranslations(e.target.value));
+langSelectHeader.addEventListener("change", (e)=>{
+  applyTranslations(e.target.value);
+});
+
 applyTranslations(currentLang);
 updateStats();
 </script>
