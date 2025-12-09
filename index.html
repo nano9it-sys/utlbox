@@ -120,6 +120,7 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
     <option value="zh">Chinese</option>
     <option value="ja">Japanese</option>
   </select>
+  <button id="translateBtn">Translate Text</button>
 </div>
 
 <div class="textarea-wrapper">
@@ -154,6 +155,8 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
+// ----------------------
+// Translation API (LibreTranslate) ----------------------
 async function translateText(text, targetLang) {
   if(!text.trim()) return "";
   try {
@@ -167,6 +170,9 @@ async function translateText(text, targetLang) {
   } catch(e){ console.error(e); return text; }
 }
 
+// ----------------------
+// Elements
+// ----------------------
 const txt = document.getElementById("textInput");
 const sel = document.getElementById("caseSelect");
 const charBox = document.getElementById("charBox");
@@ -179,10 +185,29 @@ const s_space = document.getElementById("s_space");
 const dup_count = document.getElementById("dup_count");
 const dup_table = document.getElementById("dup_table").querySelector("tbody");
 const highlightLayer = document.getElementById("highlightLayer");
-const translateLang = document.getElementById("translateLang");
+const langSelectHeader = document.getElementById("langSelectHeader");
+const headerTitle = document.getElementById("headerTitle");
+const clearBtn = document.getElementById("clearBtn");
 const copyBtn = document.getElementById("copyBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const downloadFormat = document.getElementById("downloadFormat");
+const darkLabelSpan = document.getElementById("darkLabel");
 const copyTooltip = document.getElementById("copyTooltip");
+const label_chars = document.getElementById("label_chars");
+const label_words = document.getElementById("label_words");
+const label_sent = document.getElementById("label_sent");
+const label_para = document.getElementById("label_para");
+const label_space = document.getElementById("label_space");
+const dupLabelSpan = document.getElementById("dupLabel");
+const dup_th_word = document.getElementById("dup_th_word");
+const dup_th_count = document.getElementById("dup_th_count");
+const noDuplicatesText = document.getElementById("noDuplicatesText");
+const translateBtn = document.getElementById("translateBtn");
+const translateLang = document.getElementById("translateLang");
 
+// ----------------------
+// Case functions
+// ----------------------
 function sentenceCase(t){ t=t.toLowerCase(); return t.replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g,m=>m.toUpperCase()); }
 function lower(t){ return t.toLowerCase(); }
 function upper(t){ return t.toUpperCase(); }
@@ -190,6 +215,9 @@ function capital(t){ return t.replace(/\b(\w)(\w*)/g,(_,a,b)=>a.toUpperCase()+b.
 function toggleCase(t){ return t.split("").map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join(""); }
 function applyCase(text){ switch(sel.value){ case"sentence":return sentenceCase(text); case"lower":return lower(text); case"upper":return upper(text); case"capital":return capital(text); case"toggle":return toggleCase(text);} return text; }
 
+// ----------------------
+// Stats & duplicates
+// ----------------------
 function updateStats(){ const t = txt.value;
   s_chars.textContent = t.length;
   s_words.textContent = t.trim()?t.trim().split(/\s+/).length:0;
@@ -230,8 +258,12 @@ function updateDuplicates(text){
   highlightDuplicates(text);
 }
 
+// ----------------------
+// Event listeners
+// ----------------------
 sel.addEventListener("change", ()=>{ txt.value=applyCase(txt.value); updateStats(); });
-txt.addEventListener("input", ()=>{ updateStats(); debounceTranslate(); });
+txt.addEventListener("input", ()=>updateStats());
+clearBtn.addEventListener("click", ()=>{ txt.value=""; updateStats(); });
 darkToggle.addEventListener("change", ()=>{ document.body.classList.toggle("dark"); });
 copyBtn.addEventListener("click", ()=>{
   navigator.clipboard.writeText(txt.value);
@@ -240,29 +272,23 @@ copyBtn.addEventListener("click", ()=>{
 });
 
 // ----------------------
-// Debounce for live translation
-let debounceTimer;
-function debounceTranslate(){
-  clearTimeout(debounceTimer);
-  debounceTimer=setTimeout(liveTranslate, 1000); // 1 sec delay
-}
-
-// Live translation
-async function liveTranslate(){
+// Translate button
+// ----------------------
+translateBtn.addEventListener("click", async ()=>{
   const target = translateLang.value;
-  const original = txt.value;
-  if(!original.trim()) return;
-  const translated = await translateText(original, target);
+  const translated = await translateText(txt.value, target);
   txt.value = translated;
   updateStats();
-}
+});
 
-// Google Translate widget
+// ----------------------
+// Google Translate widget (for UI only)
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,es,fr,de,hi,zh-CN,ja,ru,ar,pt',layout:google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
 }
 const gScript=document.createElement("script"); gScript.src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"; document.body.appendChild(gScript);
 
+// Initial update
 updateStats();
 </script>
 </body>
