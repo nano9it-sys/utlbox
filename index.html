@@ -260,10 +260,29 @@ copyBtn.addEventListener("click", ()=>{
 // ----------------------
 // Google Translate
 // ----------------------
+<!-- Replace your hidden container with this visible one -->
+<div id="google_translate_element"></div> <!-- keep it visible for initialization -->
+
+<script type="text/javascript">
 function googleTranslateElementInit() {
-  new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,es,fr,de,hi,zh-CN,ja,ru,ar,pt',layout:google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+  new google.translate.TranslateElement(
+    {
+      pageLanguage: 'en',
+      includedLanguages: 'en,es,fr,de,hi,zh-CN,ja,ru,ar,pt',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    },
+    'google_translate_element'
+  );
 }
-const gScript=document.createElement("script"); gScript.src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"; document.body.appendChild(gScript);
+
+// Load Google Translate script
+(function() {
+  var gtScript = document.createElement('script');
+  gtScript.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+  gtScript.type = "text/javascript";
+  document.getElementsByTagName('head')[0].appendChild(gtScript);
+})();
+</script>
 
 // ----------------------
 // Language system
@@ -305,3 +324,4 @@ updateStats();
 </script>
 </body>
 </html>
+
