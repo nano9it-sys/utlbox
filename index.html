@@ -62,6 +62,9 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   visibility: visible;
   opacity: 1;
 }
+
+/* Optional: Hide Google Translate widget but keep it initialized */
+#google_translate_element { position:absolute; left:-9999px; top:0; }
 </style>
 </head>
 <body>
@@ -96,7 +99,7 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   <div id="charBox">0 characters</div>
 
   <button id="copyBtn">Copy</button>
-<span id="copyTooltip" class="copy-tooltip">Copied!</span>
+  <span id="copyTooltip" class="copy-tooltip">Copied!</span>
 
   <select id="downloadFormat" aria-label="Download format">
     <option value="txt">Text (.txt)</option>
@@ -137,7 +140,7 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
 </div>
 
 <!-- Google Translate hidden container -->
-<div id="google_translate_element" style="display:none;"></div>
+<div id="google_translate_element"></div>
 
 <!-- libs -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -150,7 +153,6 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
 const translations = {
   "en": { headerTitle:"Sentence Case Character Counter", placeholder:"Type your text here...", clearBtn:"Clear", copyBtn:"Copy", copyTooltip:"Copied!", downloadBtn:"Download", darkLabel:"Dark", caseOptions:{sentence:"Sentence case",lower:"lowercase",upper:"UPPERCASE",capital:"Capitalize Each Word",toggle:"tOGGLE cASE"}, downloadOptions:{txt:"Text (.txt)",pdf:"PDF (.pdf)",doc:"Word (.docx)",xlsx:"Excel (.xlsx)"}, stats:{chars:"CHARS",words:"WORDS",sent:"SENTENCES",para:"PARA",space:"SPACES"}, dupLabel:"Duplicate Words Count:", dupTable:{word:"Word",count:"Count",nodups:"No duplicates"}},
   "es": { headerTitle:"Contador de Caracteres (Mayúsculas de Oración)", placeholder:"Escribe tu texto aquí...", clearBtn:"Limpiar", copyBtn:"Copiar", copyTooltip:"¡Copiado!", downloadBtn:"Descargar", darkLabel:"Oscuro", caseOptions:{sentence:"Oración",lower:"minúsculas",upper:"MAYÚSCULAS",capital:"Capitalizar Cada Palabra",toggle:"cAMBIO dE mAYÚSCULAS"}, downloadOptions:{txt:"Texto (.txt)",pdf:"PDF (.pdf)",doc:"Word (.docx)",xlsx:"Excel (.xlsx)"}, stats:{chars:"CAR",words:"PALABRAS",sent:"ORACIONES",para:"PÁRRAFOS",space:"ESPACIOS"}, dupLabel:"Cantidad de Palabras Duplicadas:", dupTable:{word:"Palabra",count:"Cuenta",nodups:"Sin duplicados"}}
-  // ...add other languages here
 };
 
 // ----------------------
@@ -260,29 +262,19 @@ copyBtn.addEventListener("click", ()=>{
 // ----------------------
 // Google Translate
 // ----------------------
-<!-- Replace your hidden container with this visible one -->
-<div id="google_translate_element"></div> <!-- keep it visible for initialization -->
-
-<script type="text/javascript">
 function googleTranslateElementInit() {
-  new google.translate.TranslateElement(
-    {
-      pageLanguage: 'en',
-      includedLanguages: 'en,es,fr,de,hi,zh-CN,ja,ru,ar,pt',
-      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-    },
-    'google_translate_element'
-  );
+  new google.translate.TranslateElement({
+      pageLanguage:'en',
+      includedLanguages:'en,es,fr,de,hi,zh-CN,ja,ru,ar,pt',
+      layout:google.translate.TranslateElement.InlineLayout.SIMPLE
+  }, 'google_translate_element');
 }
-
-// Load Google Translate script
-(function() {
+(function(){
   var gtScript = document.createElement('script');
   gtScript.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
   gtScript.type = "text/javascript";
-  document.getElementsByTagName('head')[0].appendChild(gtScript);
+  document.head.appendChild(gtScript);
 })();
-</script>
 
 // ----------------------
 // Language system
@@ -313,9 +305,6 @@ function applyTranslations(lang){
   dup_th_word.textContent=t.dupTable.word;
   dup_th_count.textContent=t.dupTable.count;
   copyTooltip.textContent=t.copyTooltip;
-
-  const select=document.querySelector(".goog-te-combo");
-  if(select){ select.value=lang; select.dispatchEvent(new Event('change')); }
 }
 
 langSelectHeader.addEventListener("change", (e)=>applyTranslations(e.target.value));
@@ -324,4 +313,3 @@ updateStats();
 </script>
 </body>
 </html>
-
