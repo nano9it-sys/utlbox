@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sentence Case Character Counter</title>
+
 <style>
 body { font-family: Arial, sans-serif; background: #f2f4f8; display: flex; justify-content: center; padding: 30px; transition: background 0.3s, color 0.3s; }
 body.dark { background: #1a1a1a; color: white; }
@@ -18,54 +19,47 @@ body.dark .app-container { background: #222; }
   color: #fff;
   display: flex;
   align-items: center;
-  justify-content: space-between;   /* ← Push left + right */
+  justify-content: space-between; /* Heading left + Buttons right */
 }
 
 .header-title {
   font-size: 28px;
   font-weight: 900;
   margin: 0;
-  text-align: center;
 }
 
-/* Undo / Redo Buttons (placed inline, to the right of title visually) */
-.header-actions {
-  position: absolute;
-  right: 16px;
-  top: 12px;
-  display:flex;
-  gap:8px;
+/* Undo / Redo Buttons */
+.header-buttons {
+  display: flex;
+  gap: 10px;
 }
 
 .undo-redo-btn {
   background: white;
   border: none;
-  padding: 6px 12px;
-  font-size: 14px;
+  padding: 6px 14px;
+  font-size: 15px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
   color: #007bff;
   border: 2px solid #fff;
-  display:flex;
-  align-items:center;
-  gap:6px;
 }
-.undo-redo-btn:hover { background: #eaeaea; }
+.undo-redo-btn:hover { background: #e3e3e3; }
 
 /* Toolbar */
 .toolbar { background: #007bff; padding: 12px 20px; display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; color: #fff; overflow-x: auto; }
-.toolbar select, .toolbar button, #charBox { height: 40px; padding: 0 12px; border-radius: 8px; font-weight: bold; font-size: 15px; border: none; }
-.toolbar select { border: 2px solid black; }
-.toolbar button { background: white; cursor: pointer; border: 2px solid #ccc; }
+select, button, #charBox { height: 40px; padding: 0 12px; border-radius: 8px; font-weight: bold; font-size: 15px; border: none; }
+select { border: 2px solid black; }
+button { background: white; cursor: pointer; border: 2px solid #ccc; }
 #clearBtn { color: red; }
-#charBox { background: #ffeb3b; color: #007bff; text-transform: capitalize; box-shadow: 0 3px 8px rgba(0,0,0,0.2); font-weight: bold; display: flex; align-items: center; padding: 0 14px; min-width:120px; justify-content:center; }
-.toggle-label { display: flex; align-items: center; gap: 5px; font-weight: bold; color: #fff; }
+#charBox { background: #ffeb3b; color: #007bff; text-transform: capitalize; box-shadow: 0 3px 8px rgba(0,0,0,0.2); font-weight: bold; display: flex; align-items: center; }
+.toggle-label { display: flex; align-items: center; gap: 5px; font-weight: bold; }
 
 /* Textarea & Highlight */
-.textarea-wrapper { position: relative; width: 100%; max-height: 600px; background: #fff; }
-#highlightLayer { position: absolute; top: 0; left: 0; right:0; bottom:0; pointer-events: none; padding: 20px; white-space: pre-wrap; word-wrap: break-word; color: transparent; z-index: 1; line-height: 1.5; box-sizing: border-box; font-size:17px; font-family:inherit; }
-#textInput { position: relative; width: 100%; height: 380px; padding: 20px; border: none; border-top: 2px solid #ddd; font-size: 17px; line-height: 1.5; resize: vertical; outline: none; background: transparent; color: #000; z-index: 2; box-sizing: border-box; }
+.textarea-wrapper { position: relative; width: 100%; max-height: 400px; }
+#highlightLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; padding: 20px; white-space: pre-wrap; word-wrap: break-word; color: transparent; z-index: 1; line-height: 1.5; box-sizing: border-box; }
+#textInput { position: relative; width: 100%; height: 300px; padding: 20px; border: none; border-top: 2px solid #ddd; font-size: 17px; line-height: 1.5; resize: vertical; outline: none; background: transparent; color: #000; z-index: 2; box-sizing: border-box; }
 body.dark #textInput { color:#fff; border-color:#444; }
 
 /* Stats */
@@ -100,361 +94,272 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   opacity: 1;
 }
 
-/* Small responsive */
-@media (max-width:700px){
-  .header-actions { right:8px; top:10px; gap:6px; }
-  .header-title { font-size:20px; }
-}
 </style>
 </head>
 <body>
+
 <div class="app-container">
 
-  <!-- HEADER -->
-  <div class="header-bar" role="banner">
+<!-- HEADER WITH UNDO/REDO -->
+<div class="header-bar">
     <h1 class="header-title">Sentence Case Character Counter</h1>
 
-    <div class="header-actions" aria-hidden="false">
-      <button class="undo-redo-btn" id="undoBtn" title="Undo (Ctrl/Cmd+Z)">↶ Undo</button>
-      <button class="undo-redo-btn" id="redoBtn" title="Redo (Ctrl/Cmd+Y)">↷ Redo</button>
+    <div class="header-buttons">
+      <button class="undo-redo-btn" onclick="undoText()">↶ Undo</button>
+      <button class="undo-redo-btn" onclick="redoText()">↷ Redo</button>
     </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <select id="caseSelect">
+    <option value="sentence">Sentence case</option>
+    <option value="lower">lowercase</option>
+    <option value="upper">UPPERCASE</option>
+    <option value="capital">Capitalize Each Word</option>
+    <option value="toggle">tOGGLE cASE</option>
+  </select>
+
+  <button id="clearBtn">Clear</button>
+
+  <div id="charBox">0 characters</div>
+
+  <button id="copyBtn">Copy</button>
+  <span id="copyTooltip" class="copy-tooltip">Copied!</span>
+
+  <select id="downloadFormat">
+    <option value="txt">Text (.txt)</option>
+    <option value="pdf">PDF (.pdf)</option>
+    <option value="doc">Word (.docx)</option>
+    <option value="xlsx">Excel (.xlsx)</option>
+  </select>
+  <button id="downloadBtn">Download</button>
+
+  <label class="toggle-label">
+    <input type="checkbox" id="darkToggle"> Dark
+  </label>
+</div>
+
+<!-- TEXTAREA -->
+<div class="textarea-wrapper">
+  <div id="highlightLayer"></div>
+  <textarea id="textInput" placeholder="Type your text here..."></textarea>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <span>CHARS <b id="s_chars">0</b></span>
+  <span>WORDS <b id="s_words">0</b></span>
+  <span>SENTENCES <b id="s_sent">0</b></span>
+  <span>PARA <b id="s_para">0</b></span>
+  <span>SPACES <b id="s_space">0</b></span>
+</div>
+
+<!-- DUPLICATES -->
+<div class="duplicates-panel">
+  <span>Duplicate Words Count: <b id="dup_count">0</b></span>
+  <div class="dup-table-wrapper">
+    <table id="dup_table">
+      <thead>
+        <tr><th>Word</th><th>Count</th></tr>
+      </thead>
+      <tbody><tr><td colspan="2">No duplicates</td></tr></tbody>
+    </table>
   </div>
+</div>
 
-  <!-- TOOLBAR -->
-  <div class="toolbar" role="toolbar" aria-label="Text tools">
-    <select id="caseSelect" aria-label="Case transform">
-      <option value="sentence">Sentence case</option>
-      <option value="lower">lowercase</option>
-      <option value="upper">UPPERCASE</option>
-      <option value="capital">Capitalize Each Word</option>
-      <option value="toggle">tOGGLE cASE</option>
-    </select>
+</div> <!-- app-container -->
 
-    <button id="clearBtn" aria-label="Clear text">Clear</button>
-
-    <div id="charBox" aria-live="polite">0 characters</div>
-
-    <button id="copyBtn" aria-label="Copy text">Copy</button>
-    <span id="copyTooltip" class="copy-tooltip" role="status">Copied!</span>
-
-    <select id="downloadFormat" aria-label="Download format">
-      <option value="txt">Text (.txt)</option>
-      <option value="pdf">PDF (.pdf)</option>
-      <option value="doc">Word (.docx)</option>
-      <option value="xlsx">Excel (.xlsx)</option>
-    </select>
-    <button id="downloadBtn" aria-label="Download">Download</button>
-
-    <label class="toggle-label" style="margin-left:6px;">
-      <input type="checkbox" id="darkToggle" aria-label="Toggle dark mode"> <span style="color:#fff;">Dark</span>
-    </label>
-  </div>
-
-  <!-- TEXTAREA -->
-  <div class="textarea-wrapper">
-    <div id="highlightLayer" aria-hidden="true"></div>
-    <textarea id="textInput" placeholder="Type your text here..." aria-label="Main text input"></textarea>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats-bar" role="contentinfo">
-    <span>CHARS <b id="s_chars">0</b></span>
-    <span>WORDS <b id="s_words">0</b></span>
-    <span>SENTENCES <b id="s_sent">0</b></span>
-    <span>PARA <b id="s_para">0</b></span>
-    <span>SPACES <b id="s_space">0</b></span>
-  </div>
-
-  <!-- DUPLICATES -->
-  <div class="duplicates-panel">
-    <span>Duplicate Words Count: <b id="dup_count">0</b></span>
-    <div class="dup-table-wrapper">
-      <table id="dup_table" aria-label="Duplicate words">
-        <thead>
-          <tr><th>Word</th><th>Count</th></tr>
-        </thead>
-        <tbody><tr><td colspan="2">No duplicates</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-
-</div> <!-- .app-container -->
-
-<!-- libs -->
+<!-- LIBS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
-/* ---------- ELEMENTS (declare txt first so other code can use it) ---------- */
-const txt = document.getElementById("textInput");
-const sel = document.getElementById("caseSelect");
-const charBox = document.getElementById("charBox");
-const darkToggle = document.getElementById("darkToggle");
-const s_chars = document.getElementById("s_chars");
-const s_words = document.getElementById("s_words");
-const s_sent = document.getElementById("s_sent");
-const s_para = document.getElementById("s_para");
-const s_space = document.getElementById("s_space");
-const dup_count = document.getElementById("dup_count");
-const dup_table = document.getElementById("dup_table").querySelector("tbody");
-const highlightLayer = document.getElementById("highlightLayer");
-
-const undoBtn = document.getElementById("undoBtn");
-const redoBtn = document.getElementById("redoBtn");
-const copyBtn = document.getElementById("copyBtn");
-const tooltip = document.getElementById("copyTooltip");
-const clearBtn = document.getElementById("clearBtn");
-const downloadBtn = document.getElementById("downloadBtn");
-const downloadFormat = document.getElementById("downloadFormat");
-
 /* -----------------------
-   CASE / TRANSFORM HELPERS
+      UNDO / REDO STACK
 ------------------------*/
-function sentenceCase(t){ t = t.toLowerCase(); return t.replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g, m => m.toUpperCase()); }
+let undoStack = [];
+let redoStack = [];
+
+const txt = document.getElementById("textInput");
+
+function saveState() {
+  undoStack.push(txt.value);
+  if (undoStack.length > 100) undoStack.shift();
+}
+
+function undoText() {
+  if (undoStack.length === 0) return;
+  redoStack.push(txt.value);
+  txt.value = undoStack.pop();
+  updateStats();
+}
+
+function redoText() {
+  if (redoStack.length === 0) return;
+  undoStack.push(txt.value);
+  txt.value = redoStack.pop();
+  updateStats();
+}
+
+/* Auto-save state */
+txt.addEventListener("input", () => {
+  saveState();
+});
+
+/* -------------------------
+     MAIN SCRIPT
+-------------------------*/
+
+const sel=document.getElementById("caseSelect");
+const charBox=document.getElementById("charBox");
+const darkToggle=document.getElementById("darkToggle");
+const s_chars=document.getElementById("s_chars");
+const s_words=document.getElementById("s_words");
+const s_sent=document.getElementById("s_sent");
+const s_para=document.getElementById("s_para");
+const s_space=document.getElementById("s_space");
+const dup_count=document.getElementById("dup_count");
+const dup_table=document.getElementById("dup_table").querySelector("tbody");
+const highlightLayer=document.getElementById("highlightLayer");
+
+function sentenceCase(t){ t=t.toLowerCase(); return t.replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g,m=>m.toUpperCase()); }
 function lower(t){ return t.toLowerCase(); }
 function upper(t){ return t.toUpperCase(); }
-function capital(t){ return t.replace(/\b(\w)(\w*)/g, (_, a, b) => a.toUpperCase() + b.toLowerCase()); }
-function toggleCase(t){ return t.split("").map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join(""); }
-function applyCase(text){ switch(sel.value){ case "sentence": return sentenceCase(text); case "lower": return lower(text); case "upper": return upper(text); case "capital": return capital(text); case "toggle": return toggleCase(text);} return text; }
+function capital(t){ return t.replace(/\b(\w)(\w*)/g,(_,a,b)=>a.toUpperCase()+b.toLowerCase()); }
+function toggle(t){ return t.split("").map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join(""); }
+function applyCase(text){
+  switch(sel.value){
+    case"sentence":return sentenceCase(text);
+    case"lower":return lower(text);
+    case"upper":return upper(text);
+    case"capital":return capital(text);
+    case"toggle":return toggle(text);
+  }
+  return text;
+}
 
-/* -----------------------
-   DUPLICATE HIGHLIGHT & STATS
-------------------------*/
 function updateStats(){
-  const t = txt.value;
-  s_chars.textContent = t.length;
-  s_words.textContent = t.trim() ? t.trim().split(/\s+/).length : 0;
-  s_sent.textContent = t.split(/[.!?]+/).filter(Boolean).length;
-  s_para.textContent = t.split(/\n+/).filter(Boolean).length;
-  s_space.textContent = (t.match(/ /g) || []).length;
-  charBox.textContent = t.length + " characters";
+  const t=txt.value;
+  s_chars.textContent=t.length;
+  s_words.textContent=t.trim()? t.trim().split(/\s+/).length:0;
+  s_sent.textContent=t.split(/[.!?]+/).filter(Boolean).length;
+  s_para.textContent=t.split(/\n+/).filter(Boolean).length;
+  s_space.textContent=(t.match(/ /g)||[]).length;
+  charBox.textContent=t.length+" characters";
   updateDuplicates(t);
 }
 
 function highlightDuplicates(text){
-  // keep punctuation out of word counts; highlight repeated words
-  const words = text.toLowerCase().match(/\b\w+\b/g) || [];
-  const counts = {};
-  words.forEach(w => counts[w] = (counts[w] || 0) + 1);
-  let highlighted = text.replace(/\b\w+\b/g, word => {
-    return counts[word.toLowerCase()] > 1 ? `<mark style="background:yellow;color:black;">${word}</mark>` : word;
+  const words=text.toLowerCase().match(/\b\w+\b/g)||[];
+  const counts={}; words.forEach(w=>counts[w]=(counts[w]||0)+1);
+  let highlighted = text.replace(/\b\w+\b/g, word=>{
+    return counts[word.toLowerCase()]>1
+      ? `<mark style="background:yellow;color:black;">${word}</mark>`
+      : word;
   });
-  // preserve newlines and spaces visually
-  highlighted = highlighted.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
+  highlighted = highlighted.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;');
   highlightLayer.innerHTML = highlighted;
 }
 
 function updateDuplicates(text){
-  const words = text.toLowerCase().match(/\b\w+\b/g) || [];
-  const counts = {};
-  words.forEach(w => counts[w] = (counts[w] || 0) + 1);
-  const duplicates = Object.keys(counts).filter(k => counts[k] > 1);
-  dup_count.textContent = duplicates.length;
-  dup_table.innerHTML = "";
-  if (duplicates.length){
-    duplicates.forEach(w => {
-      const tr = document.createElement("tr");
-      const tdW = document.createElement("td"); tdW.textContent = w;
-      const tdC = document.createElement("td"); tdC.textContent = counts[w];
-      tr.appendChild(tdW); tr.appendChild(tdC);
+  const words=text.toLowerCase().match(/\b\w+\b/g)||[];
+  const counts={}; words.forEach(w=>counts[w]=(counts[w]||0)+1);
+  const duplicates=Object.keys(counts).filter(k=>counts[k]>1);
+  dup_count.textContent=duplicates.length;
+  dup_table.innerHTML="";
+  if(duplicates.length){
+    duplicates.forEach(w=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${w}</td><td>${counts[w]}</td>`;
       dup_table.appendChild(tr);
     });
-  } else {
-    const tr = document.createElement("tr");
-    const td = document.createElement("td"); td.colSpan = 2; td.textContent = "No duplicates";
-    tr.appendChild(td); dup_table.appendChild(tr);
+  } else{
+    dup_table.innerHTML=`<tr><td colspan="2">No duplicates</td></tr>`;
   }
   highlightDuplicates(text);
 }
 
-/* -----------------------
-   UNDO / REDO (robust)
-   - captures states on beforeinput
-   - undo/redo buttons & keyboard shortcuts
-------------------------*/
-let undoStack = [];
-let redoStack = [];
-const MAX_STACK = 200;
-
-// push current state to undo stack
-function pushUndoState(state){
-  undoStack.push(state);
-  if (undoStack.length > MAX_STACK) undoStack.shift();
-}
-
-// beforeinput handler: save previous value (so undo returns to it)
-txt.addEventListener('beforeinput', (e) => {
-  // Save current value for undo BEFORE the input modifies it
-  pushUndoState(txt.value);
-  // new typing should clear redo history
-  redoStack = [];
+/* CASE CHANGE */
+sel.addEventListener("change",()=>{ 
+  const s=txt.selectionStart,e=txt.selectionEnd;
+  txt.value=applyCase(txt.value);
+  txt.setSelectionRange(s,e);
+  updateStats(); 
 });
 
-// Undo - restore last state
-function undoText(){
-  if (!undoStack.length) return;
-  // push current state to redo so we can redo
-  redoStack.push(txt.value);
-  const prev = undoStack.pop();
-  txt.value = prev;
-  updateStats();
-  // place cursor at end
-  setTimeout(()=> txt.selectionStart = txt.selectionEnd = txt.value.length, 0);
-}
-
-// Redo - restore from redo stack
-function redoText(){
-  if (!redoStack.length) return;
-  // push current to undo
-  pushUndoState(txt.value);
-  const nxt = redoStack.pop();
-  txt.value = nxt;
-  updateStats();
-  setTimeout(()=> txt.selectionStart = txt.selectionEnd = txt.value.length, 0);
-}
-
-// wire buttons
-undoBtn.addEventListener('click', undoText);
-redoBtn.addEventListener('click', redoText);
-
-// keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  const cmd = navigator.platform.match(/Mac/i) ? e.metaKey : e.ctrlKey;
-  if (cmd && e.key.toLowerCase() === 'z' && !e.shiftKey) {
-    e.preventDefault();
-    undoText();
-  } else if ((cmd && e.key.toLowerCase() === 'y') || (cmd && e.shiftKey && e.key.toLowerCase() === 'z')) {
-    e.preventDefault();
-    redoText();
-  }
-});
-
-/* -----------------------
-   EVENT: CASE SELECT CHANGE
-------------------------*/
-sel.addEventListener('change', () => {
-  const s = txt.selectionStart, e = txt.selectionEnd;
-  txt.value = applyCase(txt.value);
-  try { txt.setSelectionRange(s, e); } catch(_) {}
-  updateStats();
-});
-
-/* -----------------------
-   TEXT INPUT HANDLING
-------------------------*/
-let composing = false;
-txt.addEventListener('compositionstart', ()=> composing = true);
-txt.addEventListener('compositionend', ()=> composing = false);
-
-// input event: apply sentence-case live when selected; update stats
-txt.addEventListener('input', () => {
-  const s = txt.selectionStart, e = txt.selectionEnd;
-  if (sel.value === 'sentence' && !composing) {
-    const updated = applyCase(txt.value);
-    if (updated !== txt.value) {
-      txt.value = updated;
-      try { txt.setSelectionRange(s, e); } catch(_) {}
+/* INPUT (LIVE) */
+txt.addEventListener("input",()=>{ 
+  const s=txt.selectionStart,e=txt.selectionEnd;
+  if(sel.value==="sentence"){
+    const updated=applyCase(txt.value);
+    if(updated!==txt.value){
+      txt.value=updated;
+      txt.setSelectionRange(s,e);
     }
   }
-  // clear redo if user typed (we already cleared in beforeinput for most cases)
-  // update stats
   updateStats();
 });
 
-/* keep highlightLayer scroll in sync with textarea scroll */
-txt.addEventListener('scroll', () => {
-  highlightLayer.scrollTop = txt.scrollTop;
-  highlightLayer.scrollLeft = txt.scrollLeft;
+/* CLEAR */
+document.getElementById("clearBtn").addEventListener("click",()=>{ 
+  txt.value=""; 
+  updateStats(); 
 });
 
-/* -----------------------
-   CLEAR BUTTON
-------------------------*/
-clearBtn.addEventListener('click', () => {
-  pushUndoState(txt.value); // allow clearing to be undone
-  txt.value = "";
-  updateStats();
-});
+/* COPY */
+const copyBtn=document.getElementById("copyBtn");
+const tooltip=document.getElementById("copyTooltip");
 
-/* -----------------------
-   COPY BUTTON + TOOLTIP
-------------------------*/
-copyBtn.addEventListener('click', () => {
-  const textToCopy = txt.value;
-  navigator.clipboard.writeText(textToCopy).then(() => {
-    const rect = copyBtn.getBoundingClientRect();
-    tooltip.style.top = (rect.top - 36 + window.scrollY) + 'px';
-    tooltip.style.left = (rect.left + window.scrollX) + 'px';
-    tooltip.classList.add('show');
-    setTimeout(()=> tooltip.classList.remove('show'), 2000);
-  }).catch(() => {
-    // fallback
-    const temp = document.createElement('textarea');
-    temp.value = textToCopy;
-    document.body.appendChild(temp);
-    temp.select();
-    document.execCommand('copy');
-    document.body.removeChild(temp);
+copyBtn.addEventListener("click",()=>{
+  navigator.clipboard.writeText(txt.value).then(()=>{
+    const rect=copyBtn.getBoundingClientRect();
+    tooltip.style.top=rect.top-35+"px";
+    tooltip.style.left=rect.left+"px";
+    tooltip.classList.add("show");
+    setTimeout(()=>tooltip.classList.remove("show"),2000);
   });
 });
 
-/* -----------------------
-   DOWNLOAD (txt/pdf/doc/xlsx)
-------------------------*/
-downloadBtn.addEventListener('click', () => {
-  const text = txt.value;
-  const format = downloadFormat.value;
-  if (format === 'txt') {
-    const blob = new Blob([text], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'text.txt';
+/* DOWNLOAD */
+document.getElementById("downloadBtn").addEventListener("click",()=>{
+  const text=txt.value;
+  const format=document.getElementById("downloadFormat").value;
+
+  if(format==="txt"){
+    const blob=new Blob([text],{type:"text/plain"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="text.txt";
     a.click();
-  } else if (format === 'pdf') {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 10;
-    const maxLineWidth = pageWidth - margin*2;
-    const lines = doc.splitTextToSize(text, maxLineWidth);
-    doc.text(lines, margin, 10);
-    doc.save('text.pdf');
-  } else if (format === 'doc') {
-    const header = "<html><head><meta charset='utf-8'></head><body>";
-    const footer = "</body></html>";
-    const blob = new Blob([header + text + footer], { type: 'application/msword' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'text.doc';
+  }
+  else if(format==="pdf"){
+    const { jsPDF }=window.jspdf;
+    const doc=new jsPDF();
+    const lines=doc.splitTextToSize(text,180);
+    doc.text(lines,10,10);
+    doc.save("text.pdf");
+  }
+  else if(format==="doc"){
+    const blob=new Blob([text],{type:"application/msword"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="text.doc";
     a.click();
-  } else if (format === 'xlsx') {
-    const ws = XLSX.utils.aoa_to_sheet(text.split(/\r?\n/).map(line => [line]));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    XLSX.writeFile(wb, 'text.xlsx');
+  }
+  else if(format==="xlsx"){
+    const ws=XLSX.utils.aoa_to_sheet(text.split(/\n/).map(l=>[l]));
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,"Sheet1");
+    XLSX.writeFile(wb,"text.xlsx");
   }
 });
 
-/* -----------------------
-   DARK MODE
-------------------------*/
-darkToggle.addEventListener('change', () => {
-  document.body.classList.toggle('dark', darkToggle.checked);
+/* DARK MODE */
+darkToggle.addEventListener("change",()=>{ 
+  document.body.classList.toggle("dark",darkToggle.checked);
 });
-
-/* -----------------------
-   INITIALIZE UI
-------------------------*/
-updateStats();
-
-// set initial undo stack base state
-undoStack = [];
-redoStack = [];
-pushUndoState(txt.value);
-
 </script>
+
 </body>
 </html>
-6
-
-
