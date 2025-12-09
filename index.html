@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Sentence Case Character Counter</title>
 <style>
 body { font-family: Arial, sans-serif; background: #f2f4f8; display: flex; justify-content: center; padding: 30px; transition: background 0.3s, color 0.3s; }
@@ -12,7 +12,10 @@ body.dark .app-container { background: #222; }
 .header-bar { background: #007bff; padding: 18px 20px 8px; color: #fff; display: flex; align-items: center; justify-content: space-between; }
 .header-title { font-size: 28px; font-weight: 900; margin: 0; }
 
-/* Toolbar */
+/* Google Translate inline */
+#google_translate_element { margin-left: auto; }
+#google_translate_element select { height: 35px !important; border-radius: 5px; font-size: 14px; padding: 2px 5px; }
+
 .toolbar { background: #007bff; padding: 12px 20px; display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; color: #fff; overflow-x: auto; }
 select, button, #charBox { height: 40px; padding: 0 12px; border-radius: 8px; font-weight: bold; font-size: 15px; border: none; }
 button { background: white; cursor: pointer; border: 2px solid #ccc; }
@@ -20,16 +23,13 @@ button { background: white; cursor: pointer; border: 2px solid #ccc; }
 #charBox { background: #ffeb3b; color: #007bff; text-transform: capitalize; box-shadow: 0 3px 8px rgba(0,0,0,0.2); font-weight: bold; display: flex; align-items: center; }
 .toggle-label { display: flex; align-items: center; gap: 5px; font-weight: bold; }
 
-/* Textarea & Highlight */
 .textarea-wrapper { position: relative; width: 100%; max-height: 400px; }
 #highlightLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; padding: 20px; white-space: pre-wrap; word-wrap: break-word; color: transparent; z-index: 1; line-height: 1.5; box-sizing: border-box; font-size:17px; font-family:inherit; }
 #textInput { position: relative; width: 100%; height: 300px; padding: 20px; border: none; border-top: 2px solid #ddd; font-size: 17px; line-height: 1.5; resize: vertical; outline: none; background: transparent; color: #000; z-index: 2; box-sizing: border-box; }
 body.dark #textInput { color:#fff; border-color:#444; }
 
-/* Stats */
 .stats-bar { background: #007bff; padding: 15px; display: flex; justify-content: space-around; color: #fff; font-size: 16px; font-weight: bold; }
 
-/* Duplicates panel */
 .duplicates-panel { background: #e3f2fd; padding: 10px 15px; border-top: 2px solid #007bff; font-size: 14px; color: #000; }
 body.dark .duplicates-panel { background: #333; color: #fff; }
 .duplicates-panel b { color: red; }
@@ -39,14 +39,10 @@ body.dark .duplicates-panel { background: #333; color: #fff; }
 .dup-table-wrapper th { background: #007bff; color: white; position: sticky; top: 0; z-index: 2; }
 body.dark .dup-table-wrapper th { background: #555; color: #fff; }
 
-#google_translate_element { margin:10px 0; }
-
-/* Responsive */
 @media (max-width: 600px) {
   .toolbar { flex-wrap: wrap; }
   select, button, #charBox { width: 100%; justify-content: center; }
 }
-
 .copy-tooltip {
   visibility: hidden;
   background-color: #4caf50;
@@ -71,13 +67,11 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
 
   <div class="header-bar">
     <div class="header-title">Sentence Case Character Counter</div>
+    <div id="google_translate_element"></div>
   </div>
 
-  <!-- Google Translate Widget -->
-  <div id="google_translate_element"></div>
-
   <div class="toolbar">
-    <select id="caseSelect" aria-label="Case transform">
+    <select id="caseSelect">
       <option value="sentence">Sentence case</option>
       <option value="lower">lowercase</option>
       <option value="upper">UPPERCASE</option>
@@ -91,7 +85,7 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
     <button id="copyBtn">Copy</button>
     <span id="copyTooltip" class="copy-tooltip">Copied!</span>
 
-    <select id="downloadFormat" aria-label="Download format">
+    <select id="downloadFormat">
       <option value="txt">Text (.txt)</option>
       <option value="pdf">PDF (.pdf)</option>
       <option value="doc">Word (.docx)</option>
@@ -135,122 +129,102 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
-// Google Translate
+// ----------------------
+// Case functions
+// ----------------------
+const txt = document.getElementById("textInput");
+const sel = document.getElementById("caseSelect");
+const charBox = document.getElementById("charBox");
+const darkToggle = document.getElementById("darkToggle");
+const s_chars = document.getElementById("s_chars");
+const s_words = document.getElementById("s_words");
+const s_sent = document.getElementById("s_sent");
+const s_para = document.getElementById("s_para");
+const s_space = document.getElementById("s_space");
+const dup_count = document.getElementById("dup_count");
+const dup_table = document.getElementById("dup_table").querySelector("tbody");
+const highlightLayer = document.getElementById("highlightLayer");
+
+function sentenceCase(t){ t=t.toLowerCase(); return t.replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g,m=>m.toUpperCase()); }
+function lower(t){ return t.toLowerCase(); }
+function upper(t){ return t.toUpperCase(); }
+function capital(t){ return t.replace(/\b(\w)(\w*)/g,(_,a,b)=>a.toUpperCase()+b.toLowerCase()); }
+function toggleCase(t){ return t.split("").map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join(""); }
+function applyCase(text){ switch(sel.value){ case"sentence":return sentenceCase(text); case"lower":return lower(text); case"upper":return upper(text); case"capital":return capital(text); case"toggle":return toggleCase(text);} return text; }
+
+// ----------------------
+// Stats & duplicates
+// ----------------------
+function updateStats(){ const t = txt.value;
+  s_chars.textContent = t.length;
+  s_words.textContent = t.trim()?t.trim().split(/\s+/).length:0;
+  s_sent.textContent = t.split(/[.!?]+/).filter(Boolean).length;
+  s_para.textContent = t.split(/\n+/).filter(Boolean).length;
+  s_space.textContent = (t.match(/ /g)||[]).length;
+  charBox.textContent = t.length + " characters";
+  updateDuplicates(t);
+}
+
+function highlightDuplicates(text){
+  const words = text.toLowerCase().match(/\b\w+\b/g)||[];
+  const counts = {}; words.forEach(w=>counts[w]=(counts[w]||0)+1);
+  let highlighted = text.replace(/\b\w+\b/g, word=>counts[word.toLowerCase()]>1?`<mark style="background:yellow;color:black;">${word}</mark>`:word);
+  highlighted = highlighted.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;');
+  highlightLayer.innerHTML = highlighted;
+}
+
+function updateDuplicates(text){
+  const words = text.toLowerCase().match(/\b\w+\b/g)||[];
+  const counts = {}; words.forEach(w=>counts[w]=(counts[w]||0)+1);
+  const duplicates = Object.keys(counts).filter(k=>counts[k]>1);
+  dup_count.textContent = duplicates.length;
+  dup_table.innerHTML = "";
+  if(duplicates.length){
+    duplicates.forEach(w=>{
+      const tr=document.createElement("tr");
+      const tdW=document.createElement("td"); tdW.textContent=w;
+      const tdC=document.createElement("td"); tdC.textContent=counts[w];
+      tr.appendChild(tdW); tr.appendChild(tdC);
+      dup_table.appendChild(tr);
+    });
+  } else {
+    const tr=document.createElement("tr");
+    const td=document.createElement("td"); td.colSpan=2; td.textContent="No duplicates";
+    tr.appendChild(td); dup_table.appendChild(tr);
+  }
+  highlightDuplicates(text);
+}
+
+// ----------------------
+// Event listeners
+// ----------------------
+sel.addEventListener("change", ()=>{ txt.value=applyCase(txt.value); updateStats(); });
+txt.addEventListener("input", ()=>updateStats());
+document.getElementById("clearBtn").addEventListener("click", ()=>{ txt.value=""; updateStats(); });
+darkToggle.addEventListener("change", ()=>{ document.body.classList.toggle("dark"); });
+document.getElementById("copyBtn").addEventListener("click", ()=>{
+  navigator.clipboard.writeText(txt.value);
+  const tooltip=document.getElementById("copyTooltip");
+  tooltip.classList.add("show");
+  setTimeout(()=>tooltip.classList.remove("show"),2000);
+});
+
+// ----------------------
+// Google Translate Init
+// ----------------------
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({
-    pageLanguage: 'en',
-    includedLanguages: 'en,es,fr,de,hi,zh-CN,ja,ru,ar,pt',
+    pageLanguage:'en',
+    includedLanguages:'en,es,fr,de,hi,zh-CN,ja,ru,ar,pt',
     layout: google.translate.TranslateElement.InlineLayout.SIMPLE
   }, 'google_translate_element');
 }
-var gtScript = document.createElement('script');
-gtScript.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+var gtScript=document.createElement('script');
+gtScript.src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
 document.head.appendChild(gtScript);
 
-// Textarea features
-const textInput = document.getElementById('textInput');
-const charBox = document.getElementById('charBox');
-const s_chars = document.getElementById('s_chars');
-const s_words = document.getElementById('s_words');
-const s_sent = document.getElementById('s_sent');
-const s_para = document.getElementById('s_para');
-const s_space = document.getElementById('s_space');
-const dup_count = document.getElementById('dup_count');
-const dup_table = document.getElementById('dup_table').getElementsByTagName('tbody')[0];
-
-function updateStats() {
-  const text = textInput.value;
-  s_chars.textContent = text.length;
-  const words = text.match(/\b\w+\b/g) || [];
-  s_words.textContent = words.length;
-  const sentences = text.match(/[.!?]+/g) || [];
-  s_sent.textContent = sentences.length;
-  const paras = text.split(/\n+/).filter(p=>p.trim()!=='');
-  s_para.textContent = paras.length;
-  const spaces = text.match(/\s/g) || [];
-  s_space.textContent = spaces.length;
-
-  // Duplicates
-  const lowerWords = words.map(w=>w.toLowerCase());
-  const counts = {};
-  lowerWords.forEach(w=> counts[w] = (counts[w]||0)+1);
-  const duplicates = Object.entries(counts).filter(([k,v])=>v>1);
-  dup_count.textContent = duplicates.length;
-  dup_table.innerHTML = '';
-  if(duplicates.length===0){
-    dup_table.innerHTML = '<tr><td colspan="2">No duplicates</td></tr>';
-  } else {
-    duplicates.forEach(([word,count])=>{
-      dup_table.innerHTML += `<tr><td>${word}</td><td>${count}</td></tr>`;
-    });
-  }
-}
-textInput.addEventListener('input', updateStats);
-
-// Case transformation
-const caseSelect = document.getElementById('caseSelect');
-caseSelect.addEventListener('change', ()=>{
-  let text = textInput.value;
-  switch(caseSelect.value){
-    case 'sentence':
-      text = text.replace(/(^\s*\w|[.!?]\s*\w)/g,c=>c.toUpperCase());
-      break;
-    case 'lower': text = text.toLowerCase(); break;
-    case 'upper': text = text.toUpperCase(); break;
-    case 'capital': text = text.replace(/\b\w/g,c=>c.toUpperCase()); break;
-    case 'toggle': text = text.split('').map(c=> c===c.toLowerCase()?c.toUpperCase():c.toLowerCase()).join(''); break;
-  }
-  textInput.value = text;
-  updateStats();
-});
-
-// Clear button
-document.getElementById('clearBtn').addEventListener('click', ()=>{ textInput.value=''; updateStats(); });
-
-// Copy button
-const copyBtn = document.getElementById('copyBtn');
-const copyTooltip = document.getElementById('copyTooltip');
-copyBtn.addEventListener('click', ()=>{
-  textInput.select();
-  navigator.clipboard.writeText(textInput.value).then(()=>{
-    copyTooltip.classList.add('show');
-    setTimeout(()=>copyTooltip.classList.remove('show'),1000);
-  });
-});
-
-// Dark mode toggle
-document.getElementById('darkToggle').addEventListener('change', e=>{
-  document.body.classList.toggle('dark', e.target.checked);
-});
-
-// Download
-document.getElementById('downloadBtn').addEventListener('click', ()=>{
-  const format = document.getElementById('downloadFormat').value;
-  const text = textInput.value;
-  if(format==='txt'){
-    const blob = new Blob([text],{type:'text/plain'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='text.txt';
-    a.click();
-  } else if(format==='pdf'){
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text(text,10,10);
-    doc.save('text.pdf');
-  } else if(format==='doc'){
-    const blob = new Blob([text],{type:'application/msword'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='text.doc';
-    a.click();
-  } else if(format==='xlsx'){
-    const ws = XLSX.utils.aoa_to_sheet(text.split('\n').map(l=>[l]));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    XLSX.writeFile(wb,"text.xlsx");
-  }
-});
+// Initial update
+updateStats();
 </script>
 </body>
 </html>
