@@ -4,14 +4,44 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sentence Case Character Counter</title>
+
 <style>
 body { font-family: Arial, sans-serif; background: #f2f4f8; display: flex; justify-content: center; padding: 30px; transition: background 0.3s, color 0.3s; }
 body.dark { background: #1a1a1a; color: white; }
+
 .app-container { width: 850px; background: #fff; padding: 0; border-radius: 15px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
 body.dark .app-container { background: #222; }
-.header-bar { background: #007bff; padding: 18px 20px 8px; color: #fff; display: flex; align-items: center; justify-content: space-between; }
-.header-title { font-size: 28px; font-weight: 900; margin: 0; }
-#langSelectHeader { height: 30px; border-radius: 5px; font-size: 14px; padding: 2px 5px; }
+
+/* HEADER */
+.header-bar {
+  background: #007bff;
+  padding: 18px 20px 8px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.header-title {
+  font-size: 28px;
+  font-weight: 900;
+  margin: 0;
+}
+
+/* Undo / Redo Buttons */
+.undo-redo-btn {
+  background: white;
+  border: none;
+  padding: 6px 14px;
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #007bff;
+  border: 2px solid #fff;
+}
+.undo-redo-btn:hover { background: #e3e3e3; }
 
 /* Toolbar */
 .toolbar { background: #007bff; padding: 12px 20px; display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; color: #fff; overflow-x: auto; }
@@ -31,7 +61,7 @@ body.dark #textInput { color:#fff; border-color:#444; }
 /* Stats */
 .stats-bar { background: #007bff; padding: 15px; display: flex; justify-content: space-around; color: #fff; font-size: 16px; font-weight: bold; }
 
-/* Duplicates panel */
+/* Duplicate table */
 .duplicates-panel { background: #e3f2fd; padding: 10px 15px; border-top: 2px solid #007bff; font-size: 14px; color: #000; }
 body.dark .duplicates-panel { background: #333; color: #fff; }
 .duplicates-panel b { color: red; }
@@ -41,10 +71,7 @@ body.dark .duplicates-panel { background: #333; color: #fff; }
 .dup-table-wrapper th { background: #007bff; color: white; position: sticky; top: 0; z-index: 2; }
 body.dark .dup-table-wrapper th { background: #555; color: #fff; }
 
-@media (max-width: 600px) {
-  .toolbar { flex-wrap: wrap; }
-  select, button, #charBox { width: 100%; justify-content: center; }
-}
+/* Copy Tooltip */
 .copy-tooltip {
   visibility: hidden;
   background-color: #4caf50;
@@ -66,14 +93,18 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
 </style>
 </head>
 <body>
+
 <div class="app-container">
 
-<div class="header">
-    <h1 class="title">Sentence Case Character Counter</h1>
+<!-- HEADER WITH UNDO/REDO -->
+<div class="header-bar">
+    <h1 class="header-title">Sentence Case Character Counter</h1>
 
-    <div id="google_translate_element"></div>
+    <button class="undo-redo-btn" onclick="undoText()">↶ Undo</button>
+    <button class="undo-redo-btn" onclick="redoText()">↷ Redo</button>
 </div>
 
+<!-- TOOLBAR -->
 <div class="toolbar">
   <select id="caseSelect">
     <option value="sentence">Sentence case</option>
@@ -84,10 +115,11 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   </select>
 
   <button id="clearBtn">Clear</button>
+
   <div id="charBox">0 characters</div>
 
   <button id="copyBtn">Copy</button>
-<span id="copyTooltip" class="copy-tooltip">Copied!</span>
+  <span id="copyTooltip" class="copy-tooltip">Copied!</span>
 
   <select id="downloadFormat">
     <option value="txt">Text (.txt)</option>
@@ -102,11 +134,13 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   </label>
 </div>
 
+<!-- TEXTAREA -->
 <div class="textarea-wrapper">
   <div id="highlightLayer"></div>
   <textarea id="textInput" placeholder="Type your text here..."></textarea>
 </div>
 
+<!-- STATS -->
 <div class="stats-bar">
   <span>CHARS <b id="s_chars">0</b></span>
   <span>WORDS <b id="s_words">0</b></span>
@@ -115,6 +149,7 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   <span>SPACES <b id="s_space">0</b></span>
 </div>
 
+<!-- DUPLICATES -->
 <div class="duplicates-panel">
   <span>Duplicate Words Count: <b id="dup_count">0</b></span>
   <div class="dup-table-wrapper">
@@ -127,14 +162,47 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   </div>
 </div>
 
-<div id="google_translate_element" style="display:none;"></div>
+</div> <!-- app-container -->
 
+<!-- LIBS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
-// Elements
-const txt=document.getElementById("textInput");
+/* -----------------------
+      UNDO / REDO STACK
+------------------------*/
+let undoStack = [];
+let redoStack = [];
+
+function saveState() {
+  undoStack.push(txt.value);
+  if (undoStack.length > 100) undoStack.shift();
+}
+
+function undoText() {
+  if (undoStack.length === 0) return;
+  redoStack.push(txt.value);
+  txt.value = undoStack.pop();
+  updateStats();
+}
+
+function redoText() {
+  if (redoStack.length === 0) return;
+  undoStack.push(txt.value);
+  txt.value = redoStack.pop();
+  updateStats();
+}
+
+/* Auto-save state on typing */
+txt.addEventListener("input", () => {
+  saveState();
+});
+
+/* -------------------------
+     ORIGINAL SCRIPT BELOW
+-------------------------*/
+
 const sel=document.getElementById("caseSelect");
 const charBox=document.getElementById("charBox");
 const darkToggle=document.getElementById("darkToggle");
@@ -146,11 +214,9 @@ const s_space=document.getElementById("s_space");
 const dup_count=document.getElementById("dup_count");
 const dup_table=document.getElementById("dup_table").querySelector("tbody");
 const highlightLayer=document.getElementById("highlightLayer");
-const langSelectHeader=document.getElementById("langSelectHeader");
 
 let composing=false;
 
-// CASE FUNCTIONS
 function sentenceCase(t){ t=t.toLowerCase(); return t.replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g,m=>m.toUpperCase()); }
 function lower(t){ return t.toLowerCase(); }
 function upper(t){ return t.toUpperCase(); }
@@ -158,7 +224,6 @@ function capital(t){ return t.replace(/\b(\w)(\w*)/g,(_,a,b)=>a.toUpperCase()+b.
 function toggle(t){ return t.split("").map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join(""); }
 function applyCase(text){ switch(sel.value){ case"sentence":return sentenceCase(text); case"lower":return lower(text); case"upper":return upper(text); case"capital":return capital(text); case"toggle":return toggle(text);} return text; }
 
-// STATS & DUPLICATES
 function updateStats(){ const t=txt.value;
   s_chars.textContent=t.length;
   s_words.textContent=t.trim()? t.trim().split(/\s+/).length:0;
@@ -201,52 +266,60 @@ function updateDuplicates(text){
   highlightDuplicates(text);
 }
 
-// EVENTS
-sel.addEventListener("change",()=>{ const s=txt.selectionStart,e=txt.selectionEnd; txt.value=applyCase(txt.value); txt.setSelectionRange(s,e); updateStats(); });
-txt.addEventListener("input",()=>{ const s=txt.selectionStart,e=txt.selectionEnd; if(sel.value==="sentence"){ const updated=applyCase(txt.value); if(updated!==txt.value){ txt.value=updated; txt.setSelectionRange(s,e); } } updateStats(); });
+/* case select */
+sel.addEventListener("change",()=>{ 
+  const s=txt.selectionStart,e=txt.selectionEnd;
+  txt.value=applyCase(txt.value);
+  txt.setSelectionRange(s,e);
+  updateStats(); 
+});
+
+/* input */
+txt.addEventListener("input",()=>{ 
+  const s=txt.selectionStart,e=txt.selectionEnd;
+  if(sel.value==="sentence"){
+    const updated=applyCase(txt.value);
+    if(updated!==txt.value){
+      txt.value=updated;
+      txt.setSelectionRange(s,e);
+    }
+  }
+  updateStats();
+});
+
+/* composition */
 txt.addEventListener("compositionstart",()=>composing=true);
 txt.addEventListener("compositionend",()=>composing=false);
+
+/* clear */
 document.getElementById("clearBtn").addEventListener("click",()=>{ txt.value=""; updateStats(); });
 
-// COPY
+/* COPY BUTTON */
 const copyBtn = document.getElementById("copyBtn");
 const tooltip = document.getElementById("copyTooltip");
 
 copyBtn.addEventListener("click", () => {
-  const textToCopy = txt.value; // txt is your textarea element
+  const textToCopy = txt.value;
   navigator.clipboard.writeText(textToCopy).then(() => {
-    // Position tooltip above the button
     const rect = copyBtn.getBoundingClientRect();
     tooltip.style.top = rect.top - 35 + window.scrollY + "px";
     tooltip.style.left = rect.left + window.scrollX + "px";
     tooltip.classList.add("show");
-
-    // Hide after 2 seconds
-    setTimeout(() => {
-      tooltip.classList.remove("show");
-    }, 2000);
+    setTimeout(() => tooltip.classList.remove("show"), 2000);
   }).catch(() => {
-    // fallback copy
     const temp = document.createElement("textarea");
     temp.value = textToCopy;
     document.body.appendChild(temp);
     temp.select();
     document.execCommand("copy");
     document.body.removeChild(temp);
-
-    tooltip.style.top = copyBtn.getBoundingClientRect().top - 35 + window.scrollY + "px";
-    tooltip.style.left = copyBtn.getBoundingClientRect().left + window.scrollX + "px";
-    tooltip.classList.add("show");
-    setTimeout(() => tooltip.classList.remove("show"), 2000);
   });
 });
 
-
-// DOWNLOAD
+/* DOWNLOAD */
 document.getElementById("downloadBtn").addEventListener("click",()=>{
   const text = txt.value;
   const format = document.getElementById("downloadFormat").value;
-
   if(format === "txt"){
     const blob = new Blob([text], { type: "text/plain" });
     const a = document.createElement("a");
@@ -265,9 +338,7 @@ document.getElementById("downloadBtn").addEventListener("click",()=>{
     doc.save("text.pdf");
   }
   else if(format === "doc"){
-    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
-      "xmlns:w='urn:schemas-microsoft-com:office:word' "+
-      "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Document</title></head><body>";
+    const header = "<html><head><meta charset='utf-8'></head><body>";
     const footer = "</body></html>";
     const blob = new Blob([header+text+footer], { type: "application/msword" });
     const a = document.createElement("a");
@@ -283,15 +354,11 @@ document.getElementById("downloadBtn").addEventListener("click",()=>{
   }
 });
 
-// DARK MODE
-darkToggle.addEventListener("change",()=>{ if(darkToggle.checked) document.body.classList.add("dark"); else document.body.classList.remove("dark"); });
-
-// GOOGLE TRANSLATE
-function googleTranslateElementInit(){ new google.translate.TranslateElement({ pageLanguage:'en', includedLanguages:'en,es,fr,de,hi,zh-CN,ja,ru,ar,pt', layout:google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay:false },'google_translate_element'); }
-langSelectHeader.addEventListener("change",function(){ const lang=this.value; const select=document.querySelector("select.goog-te-combo"); if(select){ select.value=lang; select.dispatchEvent(new Event('change')); } });
-var gtScript=document.createElement('script'); gtScript.type='text/javascript'; gtScript.src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"; document.head.appendChild(gtScript);
-
+/* DARK MODE */
+darkToggle.addEventListener("change",()=>{ 
+  document.body.classList.toggle("dark", darkToggle.checked);
+});
 </script>
+
 </body>
 </html>
-
