@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pincode Distance Calculator</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+    }
+    .container {
+        width: 420px;
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    h2 { text-align: center; color: #333; margin-bottom: 25px; }
+    input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        font-size: 18px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    button:hover { background: #005fcc; }
+    .result {
+        margin-top: 20px;
+        padding: 15px;
+        background: #e9f5ff;
+        border-left: 5px solid #007bff;
+        font-size: 18px;
+        border-radius: 8px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Distance Calculator (PIN Code)</h2>
+
+    <input type="text" id="pin1" placeholder="Enter first PIN code">
+    <input type="text" id="pin2" placeholder="Enter second PIN code">
+
+    <button onclick="calculateDistance()">Calculate Distance</button>
+
+    <div id="output"></div>
+</div>
+
+<script>
+// Function: Fetches coordinates from PIN code using Nominatim
+async function getLatLonFromPincode(pincode) {
+    const url = `https://nominatim.openstreetmap.org/search?postalcode=${pincode}&format=json&limit=1`;
+
+    const response = await fetch(url, { 
+        headers: { "User-Agent": "DistanceCalculator/1.0" }
+    });
+
+    const data = await response.json();
+
+    if (data.length === 0) return null;
+
+    return {
+        lat: parseFloat(data[0].lat),
+        lon: parseFloat(data[0].lon)
+    };
+}
+
+// Function: Haversine formula
+function haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371; // earth radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
+
+// Main function
+async function calculateDistance() {
+    const pin1 = document.getElementById("pin1").value.trim();
+    const pin2 = document.getElementById("pin2").value.trim();
+    const output = document.getElementById("output");
+
+    if (!pin1 || !pin2) {
+        output.innerHTML = `<div class="result">⚠ Please enter both PIN codes.</div>`;
+        return;
+    }
+
+    output.innerHTML = `<div class="result">⏳ Getting location data...</div>`;
+
+    const loc1 = await getLatLonFromPincode(pin1);
+    const loc2 = await getLatLonFromPincode(pin2);
+
+    if (!loc1) {
+        output.innerHTML = `<div class="result">❌ Invalid PIN code: <b>${pin1}</b></div>`;
+        return;
+    }
+    if (!loc2) {
+        output.innerHTML = `<div class="result">❌ Invalid PIN code: <b>${pin2}</b></div>`;
+        return;
+    }
+
+    const distance = haversine(loc1.lat, loc1.lon, loc2.lat, loc2.lon);
+
+    output.innerHTML = `
+        <div class="result">
+            📍 Distance between <b>${pin1}</b> and <b>${pin2}</b>:  
+            <br><br>
+            <b>${distance.toFixed(2)} km</b>
+        </div>
+    `;
+}
+</script>
+
+</body>
+</html>
