@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sentence Case Character Counter</title>
 <style>
 body { font-family: Arial, sans-serif; background: #f2f4f8; display: flex; justify-content: center; padding: 30px; transition: background 0.3s, color 0.3s; }
@@ -11,12 +11,10 @@ body.dark { background: #1a1a1a; color: white; }
 body.dark .app-container { background: #222; }
 .header-bar { background: #007bff; padding: 18px 20px 8px; color: #fff; display: flex; align-items: center; justify-content: space-between; }
 .header-title { font-size: 28px; font-weight: 900; margin: 0; }
-#langSelectHeader { height: 30px; border-radius: 5px; font-size: 14px; padding: 2px 5px; }
 
 /* Toolbar */
 .toolbar { background: #007bff; padding: 12px 20px; display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; color: #fff; overflow-x: auto; }
 select, button, #charBox { height: 40px; padding: 0 12px; border-radius: 8px; font-weight: bold; font-size: 15px; border: none; }
-select { border: 2px solid black; }
 button { background: white; cursor: pointer; border: 2px solid #ccc; }
 #clearBtn { color: red; }
 #charBox { background: #ffeb3b; color: #007bff; text-transform: capitalize; box-shadow: 0 3px 8px rgba(0,0,0,0.2); font-weight: bold; display: flex; align-items: center; }
@@ -41,12 +39,14 @@ body.dark .duplicates-panel { background: #333; color: #fff; }
 .dup-table-wrapper th { background: #007bff; color: white; position: sticky; top: 0; z-index: 2; }
 body.dark .dup-table-wrapper th { background: #555; color: #fff; }
 
-#google_translate_element { margin:10px 0; } /* make widget visible */
+#google_translate_element { margin:10px 0; }
 
+/* Responsive */
 @media (max-width: 600px) {
   .toolbar { flex-wrap: wrap; }
   select, button, #charBox { width: 100%; justify-content: center; }
 }
+
 .copy-tooltip {
   visibility: hidden;
   background-color: #4caf50;
@@ -69,162 +69,73 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
 <body>
 <div class="app-container">
 
-<div class="header-bar">
-  <div class="header-title" id="headerTitle">Sentence Case Character Counter</div>
-  <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sentence Case Character Counter</title>
-<style>
-body { font-family: Arial, sans-serif; background: #f2f4f8; display: flex; justify-content: center; padding: 30px; transition: background 0.3s, color 0.3s; }
-body.dark { background: #1a1a1a; color: white; }
-.app-container { width: 850px; background: #fff; padding: 0; border-radius: 15px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
-body.dark .app-container { background: #222; }
-.header-bar { background: #007bff; padding: 18px 20px 8px; color: #fff; display: flex; align-items: center; justify-content: space-between; }
-.header-title { font-size: 28px; font-weight: 900; margin: 0; }
-#langSelectHeader { height: 30px; border-radius: 5px; font-size: 14px; padding: 2px 5px; }
-
-/* Toolbar */
-.toolbar { background: #007bff; padding: 12px 20px; display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; color: #fff; overflow-x: auto; }
-select, button, #charBox { height: 40px; padding: 0 12px; border-radius: 8px; font-weight: bold; font-size: 15px; border: none; }
-select { border: 2px solid black; }
-button { background: white; cursor: pointer; border: 2px solid #ccc; }
-#clearBtn { color: red; }
-#charBox { background: #ffeb3b; color: #007bff; text-transform: capitalize; box-shadow: 0 3px 8px rgba(0,0,0,0.2); font-weight: bold; display: flex; align-items: center; }
-.toggle-label { display: flex; align-items: center; gap: 5px; font-weight: bold; }
-
-/* Textarea & Highlight */
-.textarea-wrapper { position: relative; width: 100%; max-height: 400px; }
-#highlightLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; padding: 20px; white-space: pre-wrap; word-wrap: break-word; color: transparent; z-index: 1; line-height: 1.5; box-sizing: border-box; font-size:17px; font-family:inherit; }
-#textInput { position: relative; width: 100%; height: 300px; padding: 20px; border: none; border-top: 2px solid #ddd; font-size: 17px; line-height: 1.5; resize: vertical; outline: none; background: transparent; color: #000; z-index: 2; box-sizing: border-box; }
-body.dark #textInput { color:#fff; border-color:#444; }
-
-/* Stats */
-.stats-bar { background: #007bff; padding: 15px; display: flex; justify-content: space-around; color: #fff; font-size: 16px; font-weight: bold; }
-
-/* Duplicates panel */
-.duplicates-panel { background: #e3f2fd; padding: 10px 15px; border-top: 2px solid #007bff; font-size: 14px; color: #000; }
-body.dark .duplicates-panel { background: #333; color: #fff; }
-.duplicates-panel b { color: red; }
-.dup-table-wrapper { max-height: 150px; overflow-y: auto; margin-top: 5px; }
-.dup-table-wrapper table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.dup-table-wrapper th, .dup-table-wrapper td { border: 1px solid #007bff; padding: 5px; text-align: left; }
-.dup-table-wrapper th { background: #007bff; color: white; position: sticky; top: 0; z-index: 2; }
-body.dark .dup-table-wrapper th { background: #555; color: #fff; }
-
-#google_translate_element { margin:10px 0; } /* make widget visible */
-
-@media (max-width: 600px) {
-  .toolbar { flex-wrap: wrap; }
-  select, button, #charBox { width: 100%; justify-content: center; }
-}
-.copy-tooltip {
-  visibility: hidden;
-  background-color: #4caf50;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 13px;
-  position: absolute;
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
-  z-index: 1000;
-}
-.copy-tooltip.show {
-  visibility: visible;
-  opacity: 1;
-}
-</style>
-</head>
-<body>
-<div class="app-container">
-
-<div class="header-bar">
-  <div class="header-title" id="headerTitle">Sentence Case Character Counter</div>
-  <select id="langSelectHeader" aria-label="Language selector">
-    <option value="en">English</option>
-    <option value="es">Spanish</option>
-    <option value="fr">French</option>
-    <option value="de">German</option>
-    <option value="hi">Hindi</option>
-    <option value="zh-CN">Chinese</option>
-    <option value="ja">Japanese</option>
-    <option value="ru">Russian</option>
-    <option value="ar">Arabic</option>
-    <option value="pt">Portuguese</option>
-  </select>
-</div>
-
-<!-- Visible Google Translate Widget -->
-<div id="google_translate_element"></div>
-
-<div class="toolbar">
-  <select id="caseSelect" aria-label="Case transform">
-    <option value="sentence">Sentence case</option>
-    <option value="lower">lowercase</option>
-    <option value="upper">UPPERCASE</option>
-    <option value="capital">Capitalize Each Word</option>
-    <option value="toggle">tOGGLE cASE</option>
-  </select>
-
-  <button id="clearBtn">Clear</button>
-  <div id="charBox">0 characters</div>
-
-  <button id="copyBtn">Copy</button>
-  <span id="copyTooltip" class="copy-tooltip">Copied!</span>
-
-  <select id="downloadFormat" aria-label="Download format">
-    <option value="txt">Text (.txt)</option>
-    <option value="pdf">PDF (.pdf)</option>
-    <option value="doc">Word (.docx)</option>
-    <option value="xlsx">Excel (.xlsx)</option>
-  </select>
-  <button id="downloadBtn">Download</button>
-
-  <label class="toggle-label">
-    <input type="checkbox" id="darkToggle"> <span id="darkLabel">Dark</span>
-  </label>
-</div>
-
-<div class="textarea-wrapper">
-  <div id="highlightLayer"></div>
-  <textarea id="textInput" placeholder="Type your text here..."></textarea>
-</div>
-
-<div class="stats-bar" id="statsBar">
-  <span id="label_chars">CHARS <b id="s_chars">0</b></span>
-  <span id="label_words">WORDS <b id="s_words">0</b></span>
-  <span id="label_sent">SENTENCES <b id="s_sent">0</b></span>
-  <span id="label_para">PARA <b id="s_para">0</b></span>
-  <span id="label_space">SPACES <b id="s_space">0</b></span>
-</div>
-
-<div class="duplicates-panel">
-  <span id="dupLabel">Duplicate Words Count: <b id="dup_count">0</b></span>
-  <div class="dup-table-wrapper">
-    <table id="dup_table">
-      <thead>
-        <tr><th id="dup_th_word">Word</th><th id="dup_th_count">Count</th></tr>
-      </thead>
-      <tbody><tr><td colspan="2" id="noDuplicatesText">No duplicates</td></tr></tbody>
-    </table>
+  <div class="header-bar">
+    <div class="header-title">Sentence Case Character Counter</div>
   </div>
+
+  <!-- Google Translate Widget -->
+  <div id="google_translate_element"></div>
+
+  <div class="toolbar">
+    <select id="caseSelect" aria-label="Case transform">
+      <option value="sentence">Sentence case</option>
+      <option value="lower">lowercase</option>
+      <option value="upper">UPPERCASE</option>
+      <option value="capital">Capitalize Each Word</option>
+      <option value="toggle">tOGGLE cASE</option>
+    </select>
+
+    <button id="clearBtn">Clear</button>
+    <div id="charBox">0 characters</div>
+
+    <button id="copyBtn">Copy</button>
+    <span id="copyTooltip" class="copy-tooltip">Copied!</span>
+
+    <select id="downloadFormat" aria-label="Download format">
+      <option value="txt">Text (.txt)</option>
+      <option value="pdf">PDF (.pdf)</option>
+      <option value="doc">Word (.docx)</option>
+      <option value="xlsx">Excel (.xlsx)</option>
+    </select>
+    <button id="downloadBtn">Download</button>
+
+    <label class="toggle-label">
+      <input type="checkbox" id="darkToggle"> <span id="darkLabel">Dark</span>
+    </label>
+  </div>
+
+  <div class="textarea-wrapper">
+    <div id="highlightLayer"></div>
+    <textarea id="textInput" placeholder="Type your text here..."></textarea>
+  </div>
+
+  <div class="stats-bar">
+    <span>CHARS <b id="s_chars">0</b></span>
+    <span>WORDS <b id="s_words">0</b></span>
+    <span>SENTENCES <b id="s_sent">0</b></span>
+    <span>PARA <b id="s_para">0</b></span>
+    <span>SPACES <b id="s_space">0</b></span>
+  </div>
+
+  <div class="duplicates-panel">
+    <span>Duplicate Words Count: <b id="dup_count">0</b></span>
+    <div class="dup-table-wrapper">
+      <table id="dup_table">
+        <thead>
+          <tr><th>Word</th><th>Count</th></tr>
+        </thead>
+        <tbody><tr><td colspan="2">No duplicates</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <script>
-const translations = {
-  "en": { headerTitle:"Sentence Case Character Counter", placeholder:"Type your text here...", clearBtn:"Clear", copyBtn:"Copy", copyTooltip:"Copied!", downloadBtn:"Download", darkLabel:"Dark", caseOptions:{sentence:"Sentence case",lower:"lowercase",upper:"UPPERCASE",capital:"Capitalize Each Word",toggle:"tOGGLE cASE"}, downloadOptions:{txt:"Text (.txt)",pdf:"PDF (.pdf)",doc:"Word (.docx)",xlsx:"Excel (.xlsx)"}, stats:{chars:"CHARS",words:"WORDS",sent:"SENTENCES",para:"PARA",space:"SPACES"}, dupLabel:"Duplicate Words Count:", dupTable:{word:"Word",count:"Count",nodups:"No duplicates"}},
-  "es": { headerTitle:"Contador de Caracteres", placeholder:"Escribe tu texto aquí...", clearBtn:"Limpiar", copyBtn:"Copiar", copyTooltip:"¡Copiado!", downloadBtn:"Descargar", darkLabel:"Oscuro", caseOptions:{sentence:"Oración",lower:"minúsculas",upper:"MAYÚSCULAS",capital:"Capitalizar Cada Palabra",toggle:"cAMBIO dE mAYÚSCULAS"}, downloadOptions:{txt:"Texto (.txt)",pdf:"PDF (.pdf)",doc:"Word (.docx)",xlsx:"Excel (.xlsx)"}, stats:{chars:"CAR",words:"PALABRAS",sent:"ORACIONES",para:"PÁRRAFOS",space:"ESPACIOS"}, dupLabel:"Cantidad de Palabras Duplicadas:", dupTable:{word:"Palabra",count:"Cuenta",nodups:"Sin duplicados"}}
-};
-
-// Your previous JS for case transformations, stats, duplicates, copy, dark mode here...
-
-// Google Translate Init
+// Google Translate
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({
     pageLanguage: 'en',
@@ -236,112 +147,109 @@ var gtScript = document.createElement('script');
 gtScript.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
 document.head.appendChild(gtScript);
 
-// Language selection dropdown sync
-let currentLang = localStorage.getItem('utl_lang') || 'en';
-const langSelectHeader = document.getElementById("langSelectHeader");
-langSelectHeader.value = currentLang;
+// Textarea features
+const textInput = document.getElementById('textInput');
+const charBox = document.getElementById('charBox');
+const s_chars = document.getElementById('s_chars');
+const s_words = document.getElementById('s_words');
+const s_sent = document.getElementById('s_sent');
+const s_para = document.getElementById('s_para');
+const s_space = document.getElementById('s_space');
+const dup_count = document.getElementById('dup_count');
+const dup_table = document.getElementById('dup_table').getElementsByTagName('tbody')[0];
 
-langSelectHeader.addEventListener("change", (e)=>{
-  const lang = e.target.value;
-  localStorage.setItem('utl_lang', lang);
-  // Sync with Google Translate combo
-  const select = document.querySelector(".goog-te-combo");
-  if(select){ select.value = lang; select.dispatchEvent(new Event('change')); }
+function updateStats() {
+  const text = textInput.value;
+  s_chars.textContent = text.length;
+  const words = text.match(/\b\w+\b/g) || [];
+  s_words.textContent = words.length;
+  const sentences = text.match(/[.!?]+/g) || [];
+  s_sent.textContent = sentences.length;
+  const paras = text.split(/\n+/).filter(p=>p.trim()!=='');
+  s_para.textContent = paras.length;
+  const spaces = text.match(/\s/g) || [];
+  s_space.textContent = spaces.length;
+
+  // Duplicates
+  const lowerWords = words.map(w=>w.toLowerCase());
+  const counts = {};
+  lowerWords.forEach(w=> counts[w] = (counts[w]||0)+1);
+  const duplicates = Object.entries(counts).filter(([k,v])=>v>1);
+  dup_count.textContent = duplicates.length;
+  dup_table.innerHTML = '';
+  if(duplicates.length===0){
+    dup_table.innerHTML = '<tr><td colspan="2">No duplicates</td></tr>';
+  } else {
+    duplicates.forEach(([word,count])=>{
+      dup_table.innerHTML += `<tr><td>${word}</td><td>${count}</td></tr>`;
+    });
+  }
+}
+textInput.addEventListener('input', updateStats);
+
+// Case transformation
+const caseSelect = document.getElementById('caseSelect');
+caseSelect.addEventListener('change', ()=>{
+  let text = textInput.value;
+  switch(caseSelect.value){
+    case 'sentence':
+      text = text.replace(/(^\s*\w|[.!?]\s*\w)/g,c=>c.toUpperCase());
+      break;
+    case 'lower': text = text.toLowerCase(); break;
+    case 'upper': text = text.toUpperCase(); break;
+    case 'capital': text = text.replace(/\b\w/g,c=>c.toUpperCase()); break;
+    case 'toggle': text = text.split('').map(c=> c===c.toLowerCase()?c.toUpperCase():c.toLowerCase()).join(''); break;
+  }
+  textInput.value = text;
+  updateStats();
 });
-</script>
-</body>
-</html>
-</div>
 
-<!-- Visible Google Translate Widget -->
-<div id="google_translate_element"></div>
+// Clear button
+document.getElementById('clearBtn').addEventListener('click', ()=>{ textInput.value=''; updateStats(); });
 
-<div class="toolbar">
-  <select id="caseSelect" aria-label="Case transform">
-    <option value="sentence">Sentence case</option>
-    <option value="lower">lowercase</option>
-    <option value="upper">UPPERCASE</option>
-    <option value="capital">Capitalize Each Word</option>
-    <option value="toggle">tOGGLE cASE</option>
-  </select>
+// Copy button
+const copyBtn = document.getElementById('copyBtn');
+const copyTooltip = document.getElementById('copyTooltip');
+copyBtn.addEventListener('click', ()=>{
+  textInput.select();
+  navigator.clipboard.writeText(textInput.value).then(()=>{
+    copyTooltip.classList.add('show');
+    setTimeout(()=>copyTooltip.classList.remove('show'),1000);
+  });
+});
 
-  <button id="clearBtn">Clear</button>
-  <div id="charBox">0 characters</div>
+// Dark mode toggle
+document.getElementById('darkToggle').addEventListener('change', e=>{
+  document.body.classList.toggle('dark', e.target.checked);
+});
 
-  <button id="copyBtn">Copy</button>
-  <span id="copyTooltip" class="copy-tooltip">Copied!</span>
-
-  <select id="downloadFormat" aria-label="Download format">
-    <option value="txt">Text (.txt)</option>
-    <option value="pdf">PDF (.pdf)</option>
-    <option value="doc">Word (.docx)</option>
-    <option value="xlsx">Excel (.xlsx)</option>
-  </select>
-  <button id="downloadBtn">Download</button>
-
-  <label class="toggle-label">
-    <input type="checkbox" id="darkToggle"> <span id="darkLabel">Dark</span>
-  </label>
-</div>
-
-<div class="textarea-wrapper">
-  <div id="highlightLayer"></div>
-  <textarea id="textInput" placeholder="Type your text here..."></textarea>
-</div>
-
-<div class="stats-bar" id="statsBar">
-  <span id="label_chars">CHARS <b id="s_chars">0</b></span>
-  <span id="label_words">WORDS <b id="s_words">0</b></span>
-  <span id="label_sent">SENTENCES <b id="s_sent">0</b></span>
-  <span id="label_para">PARA <b id="s_para">0</b></span>
-  <span id="label_space">SPACES <b id="s_space">0</b></span>
-</div>
-
-<div class="duplicates-panel">
-  <span id="dupLabel">Duplicate Words Count: <b id="dup_count">0</b></span>
-  <div class="dup-table-wrapper">
-    <table id="dup_table">
-      <thead>
-        <tr><th id="dup_th_word">Word</th><th id="dup_th_count">Count</th></tr>
-      </thead>
-      <tbody><tr><td colspan="2" id="noDuplicatesText">No duplicates</td></tr></tbody>
-    </table>
-  </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script>
-const translations = {
-  "en": { headerTitle:"Sentence Case Character Counter", placeholder:"Type your text here...", clearBtn:"Clear", copyBtn:"Copy", copyTooltip:"Copied!", downloadBtn:"Download", darkLabel:"Dark", caseOptions:{sentence:"Sentence case",lower:"lowercase",upper:"UPPERCASE",capital:"Capitalize Each Word",toggle:"tOGGLE cASE"}, downloadOptions:{txt:"Text (.txt)",pdf:"PDF (.pdf)",doc:"Word (.docx)",xlsx:"Excel (.xlsx)"}, stats:{chars:"CHARS",words:"WORDS",sent:"SENTENCES",para:"PARA",space:"SPACES"}, dupLabel:"Duplicate Words Count:", dupTable:{word:"Word",count:"Count",nodups:"No duplicates"}},
-  "es": { headerTitle:"Contador de Caracteres", placeholder:"Escribe tu texto aquí...", clearBtn:"Limpiar", copyBtn:"Copiar", copyTooltip:"¡Copiado!", downloadBtn:"Descargar", darkLabel:"Oscuro", caseOptions:{sentence:"Oración",lower:"minúsculas",upper:"MAYÚSCULAS",capital:"Capitalizar Cada Palabra",toggle:"cAMBIO dE mAYÚSCULAS"}, downloadOptions:{txt:"Texto (.txt)",pdf:"PDF (.pdf)",doc:"Word (.docx)",xlsx:"Excel (.xlsx)"}, stats:{chars:"CAR",words:"PALABRAS",sent:"ORACIONES",para:"PÁRRAFOS",space:"ESPACIOS"}, dupLabel:"Cantidad de Palabras Duplicadas:", dupTable:{word:"Palabra",count:"Cuenta",nodups:"Sin duplicados"}}
-};
-
-// Your previous JS for case transformations, stats, duplicates, copy, dark mode here...
-
-// Google Translate Init
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'en',
-    includedLanguages: 'en,es,fr,de,hi,zh-CN,ja,ru,ar,pt',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-  }, 'google_translate_element');
-}
-var gtScript = document.createElement('script');
-gtScript.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-document.head.appendChild(gtScript);
-
-// Language selection dropdown sync
-let currentLang = localStorage.getItem('utl_lang') || 'en';
-const langSelectHeader = document.getElementById("langSelectHeader");
-langSelectHeader.value = currentLang;
-
-langSelectHeader.addEventListener("change", (e)=>{
-  const lang = e.target.value;
-  localStorage.setItem('utl_lang', lang);
-  // Sync with Google Translate combo
-  const select = document.querySelector(".goog-te-combo");
-  if(select){ select.value = lang; select.dispatchEvent(new Event('change')); }
+// Download
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  const format = document.getElementById('downloadFormat').value;
+  const text = textInput.value;
+  if(format==='txt'){
+    const blob = new Blob([text],{type:'text/plain'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='text.txt';
+    a.click();
+  } else if(format==='pdf'){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text(text,10,10);
+    doc.save('text.pdf');
+  } else if(format==='doc'){
+    const blob = new Blob([text],{type:'application/msword'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='text.doc';
+    a.click();
+  } else if(format==='xlsx'){
+    const ws = XLSX.utils.aoa_to_sheet(text.split('\n').map(l=>[l]));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.writeFile(wb,"text.xlsx");
+  }
 });
 </script>
 </body>
