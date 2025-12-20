@@ -3,114 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sentence Case Character Counter</title>
+<title>Sentence Case & GST Calculator</title>
 
 <style>
-body { font-family: Arial, sans-serif; background: #f2f4f8; display: flex; justify-content: center; padding: 30px; transition: background 0.3s, color 0.3s; }
-body.dark { background: #1a1a1a; color: white; }
+body { font-family: Arial, sans-serif; background: #f2f4f8; margin:0; transition: background 0.3s, color 0.3s; }
+body.dark { background:#1a1a1a; color:#fff; }
 
-.app-container { width: 850px; background: #fff; padding: 0; border-radius: 15px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
-body.dark .app-container { background: #222; }
+/* NAV */
+.top-nav{ background:#007bff; color:#fff; display:flex; align-items:center; padding:14px 20px; position:sticky; top:0; z-index:100; }
+.logo{font-size:22px;font-weight:900;}
+.menu{margin-left:auto; display:flex; gap:12px;}
+.menu a{color:#fff; text-decoration:none; padding:8px 14px; border-radius:6px; font-weight:bold;}
+.menu a.active, .menu a:hover{background:rgba(255,255,255,.25);}
+.hamburger{display:none; margin-left:auto; font-size:26px; cursor:pointer;}
+@media(max-width:768px){ .menu{display:none; flex-direction:column; position:absolute; top:60px; right:10px; background:#007bff; padding:10px; border-radius:10px;} .menu.show{display:flex} .hamburger{display:block} }
+
+/* APP */
+.page{display:none; justify-content:center; padding:30px;}
+.app-container { width:850px; background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,.15); }
+body.dark .app-container { background:#222; }
 
 /* HEADER */
-.header-bar {
-  background: #007bff;
-  padding: 18px 20px 12px;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Heading left + Buttons right */
-}
+.header-bar{ background:#007bff; padding:18px 20px; color:#fff; display:flex; align-items:center; justify-content:space-between; }
+.header-title{ font-size:28px; font-weight:900; margin:0; }
+.header-buttons{ display:flex; gap:10px; }
+.undo-redo-btn{ background:white; border:none; padding:6px 14px; font-size:15px; border-radius:6px; cursor:pointer; font-weight:bold; color:#007bff; border:2px solid #fff; }
+.undo-redo-btn:hover{ background:#e3e3e3; }
 
-.header-title {
-  font-size: 28px;
-  font-weight: 900;
-  margin: 0;
-}
-
-/* Undo / Redo Buttons */
-.header-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.undo-redo-btn {
-  background: white;
-  border: none;
-  padding: 6px 14px;
-  font-size: 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  color: #007bff;
-  border: 2px solid #fff;
-}
-.undo-redo-btn:hover { background: #e3e3e3; }
-
-/* Toolbar */
+/* TOOLBAR */
 .toolbar { background: #007bff; padding: 12px 20px; display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; color: #fff; overflow-x: auto; }
 select, button, #charBox { height: 40px; padding: 0 12px; border-radius: 8px; font-weight: bold; font-size: 15px; border: none; }
-select { border: 2px solid black; }
-button { background: white; cursor: pointer; border: 2px solid #ccc; }
-#clearBtn { color: red; }
-#charBox { background: #ffeb3b; color: #007bff; text-transform: capitalize; box-shadow: 0 3px 8px rgba(0,0,0,0.2); font-weight: bold; display: flex; align-items: center; }
-.toggle-label { display: flex; align-items: center; gap: 5px; font-weight: bold; }
+select { border:2px solid black; }
+button { background:white; cursor:pointer; border:2px solid #ccc; }
+#clearBtn { color:red; }
+#charBox { background:#ffeb3b; color:#007bff; text-transform:capitalize; box-shadow:0 3px 8px rgba(0,0,0,0.2); font-weight:bold; display:flex; align-items:center; }
+.toggle-label{ display:flex; align-items:center; gap:5px; font-weight:bold; }
 
-/* Textarea & Highlight */
-.textarea-wrapper { position: relative; width: 100%; max-height: 400px; }
-#highlightLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; padding: 20px; white-space: pre-wrap; word-wrap: break-word; color: transparent; z-index: 1; line-height: 1.5; box-sizing: border-box; }
-#textInput { position: relative; width: 100%; height: 300px; padding: 20px; border: none; border-top: 2px solid #ddd; font-size: 17px; line-height: 1.5; resize: vertical; outline: none; background: transparent; color: #000; z-index: 2; box-sizing: border-box; }
+/* TEXTAREA */
+.textarea-wrapper { position:relative; width:100%; max-height:400px; }
+#highlightLayer { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; padding:20px; white-space:pre-wrap; word-wrap:break-word; color:transparent; z-index:1; line-height:1.5; box-sizing:border-box; }
+#textInput { position:relative; width:100%; height:300px; padding:20px; border:none; border-top:2px solid #ddd; font-size:17px; line-height:1.5; resize:vertical; outline:none; background:transparent; color:#000; z-index:2; box-sizing:border-box; }
 body.dark #textInput { color:#fff; border-color:#444; }
 
-/* Stats */
-.stats-bar { background: #007bff; padding: 15px; display: flex; justify-content: space-around; color: #fff; font-size: 16px; font-weight: bold; }
+/* STATS */
+.stats-bar { background:#007bff; padding:15px; display:flex; justify-content:space-around; color:#fff; font-size:16px; font-weight:bold; }
 
-/* Duplicate table */
-.duplicates-panel { background: #e3f2fd; padding: 10px 15px; border-top: 2px solid #007bff; font-size: 14px; color: #000; }
-body.dark .duplicates-panel { background: #333; color: #fff; }
-.duplicates-panel b { color: red; }
-.dup-table-wrapper { max-height: 150px; overflow-y: auto; margin-top: 5px; }
-.dup-table-wrapper table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.dup-table-wrapper th, .dup-table-wrapper td { border: 1px solid #007bff; padding: 5px; text-align: left; }
-.dup-table-wrapper th { background: #007bff; color: white; position: sticky; top: 0; z-index: 2; }
-body.dark .dup-table-wrapper th { background: #555; color: #fff; }
+/* DUPLICATES */
+.duplicates-panel { background:#e3f2fd; padding:10px 15px; border-top:2px solid #007bff; font-size:14px; color:#000; }
+body.dark .duplicates-panel { background:#333; color:#fff; }
+.duplicates-panel b { color:red; }
+.dup-table-wrapper { max-height:150px; overflow-y:auto; margin-top:5px; }
+.dup-table-wrapper table { width:100%; border-collapse:collapse; font-size:13px; }
+.dup-table-wrapper th, .dup-table-wrapper td { border:1px solid #007bff; padding:5px; text-align:left; }
+.dup-table-wrapper th { background:#007bff; color:white; position:sticky; top:0; z-index:2; }
+body.dark .dup-table-wrapper th { background:#555; color:#fff; }
 
-/* Copy Tooltip */
-.copy-tooltip {
-  visibility: hidden;
-  background-color: #4caf50;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 13px;
-  position: absolute;
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
-  z-index: 1000;
-}
-.copy-tooltip.show {
-  visibility: visible;
-  opacity: 1;
-}
+/* GST BOX */
+.gst-box{ width:850px; background:#fff; padding:25px; border-radius:15px; box-shadow:0 6px 20px rgba(0,0,0,.15); margin-top:20px;}
+.gst-box input,.gst-box select{ width:100%; height:40px; margin-bottom:12px; padding:0 10px; }
 
+/* COPY TOOLTIP */
+.copy-tooltip{ visibility:hidden; background-color:#4caf50; color:white; padding:5px 10px; border-radius:5px; font-size:13px; position:absolute; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:1000; }
+.copy-tooltip.show{ visibility:visible; opacity:1; }
 </style>
 </head>
 <body>
 
+<nav class="top-nav">
+  <div class="logo">ToolBox</div>
+  <div class="hamburger" onclick="menuToggle()">☰</div>
+  <div class="menu" id="menu">
+    <a href="#sentence-case">Sentence Case</a>
+    <a href="#gst-calculator">GST Calculator</a>
+  </div>
+</nav>
+
+<!-- SENTENCE CASE -->
+<section id="sentence-case" class="page">
 <div class="app-container">
 
-<!-- HEADER WITH UNDO/REDO -->
 <div class="header-bar">
     <h1 class="header-title">Sentence Case Character Counter</h1>
-
     <div class="header-buttons">
       <button class="undo-redo-btn" onclick="undoText()">↶ Undo</button>
       <button class="undo-redo-btn" onclick="redoText()">↷ Redo</button>
     </div>
 </div>
 
-<!-- TOOLBAR -->
 <div class="toolbar">
   <select id="caseSelect">
     <option value="sentence">Sentence case</option>
@@ -121,9 +100,7 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   </select>
 
   <button id="clearBtn">Clear</button>
-
   <div id="charBox">0 characters</div>
-
   <button id="copyBtn">Copy</button>
   <span id="copyTooltip" class="copy-tooltip">Copied!</span>
 
@@ -140,13 +117,11 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   </label>
 </div>
 
-<!-- TEXTAREA -->
 <div class="textarea-wrapper">
   <div id="highlightLayer"></div>
   <textarea id="textInput" placeholder="Type your text here..."></textarea>
 </div>
 
-<!-- STATS -->
 <div class="stats-bar">
   <span>CHARS <b id="s_chars">0</b></span>
   <span>WORDS <b id="s_words">0</b></span>
@@ -155,62 +130,65 @@ body.dark .dup-table-wrapper th { background: #555; color: #fff; }
   <span>SPACES <b id="s_space">0</b></span>
 </div>
 
-<!-- DUPLICATES -->
 <div class="duplicates-panel">
   <span>Duplicate Words Count: <b id="dup_count">0</b></span>
   <div class="dup-table-wrapper">
     <table id="dup_table">
-      <thead>
-        <tr><th>Word</th><th>Count</th></tr>
-      </thead>
+      <thead><tr><th>Word</th><th>Count</th></tr></thead>
       <tbody><tr><td colspan="2">No duplicates</td></tr></tbody>
     </table>
   </div>
 </div>
 
-</div> <!-- app-container -->
+</div>
+</section>
+
+<!-- GST CALCULATOR -->
+<section id="gst-calculator" class="page">
+<div class="gst-box">
+  <h2>GST Calculator</h2>
+  <input id="total" type="number" placeholder="Total Amount (GST Included)">
+  <select id="percent">
+    <option value="5">5%</option>
+    <option value="12">12%</option>
+    <option value="18">18%</option>
+    <option value="28">28%</option>
+  </select>
+  <select id="type">
+    <option value="sc">SGST + CGST</option>
+    <option value="ig">IGST</option>
+  </select>
+  <button onclick="gst()">Calculate</button>
+  <div id="result"></div>
+</div>
+</section>
 
 <!-- LIBS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
-/* -----------------------
-      UNDO / REDO STACK
-------------------------*/
-let undoStack = [];
-let redoStack = [];
-
-const txt = document.getElementById("textInput");
-
-function saveState() {
-  undoStack.push(txt.value);
-  if (undoStack.length > 100) undoStack.shift();
+/* NAVIGATION */
+function menuToggle(){ document.getElementById("menu").classList.toggle("show") }
+function showPage(){
+  let h=location.hash||"#sentence-case";
+  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+  document.querySelector(h).style.display="flex";
+  document.querySelectorAll(".menu a").forEach(a=>a.classList.remove("active"));
+  document.querySelector(`.menu a[href='${h}']`).classList.add("active");
 }
+window.addEventListener("hashchange",showPage);
+showPage();
 
-function undoText() {
-  if (undoStack.length === 0) return;
-  redoStack.push(txt.value);
-  txt.value = undoStack.pop();
-  updateStats();
-}
+/* UNDO/REDO */
+let undoStack=[], redoStack=[];
+const txt=document.getElementById("textInput");
+function saveState(){ undoStack.push(txt.value); if(undoStack.length>100) undoStack.shift(); }
+function undoText(){ if(!undoStack.length) return; redoStack.push(txt.value); txt.value=undoStack.pop(); updateStats(); }
+function redoText(){ if(!redoStack.length) return; undoStack.push(txt.value); txt.value=redoStack.pop(); updateStats(); }
+txt.addEventListener("input",()=>{ saveState(); });
 
-function redoText() {
-  if (redoStack.length === 0) return;
-  undoStack.push(txt.value);
-  txt.value = redoStack.pop();
-  updateStats();
-}
-
-/* Auto-save state */
-txt.addEventListener("input", () => {
-  saveState();
-});
-
-/* -------------------------
-     MAIN SCRIPT
--------------------------*/
-
+/* CASE FUNCTIONS */
 const sel=document.getElementById("caseSelect");
 const charBox=document.getElementById("charBox");
 const darkToggle=document.getElementById("darkToggle");
@@ -228,16 +206,7 @@ function lower(t){ return t.toLowerCase(); }
 function upper(t){ return t.toUpperCase(); }
 function capital(t){ return t.replace(/\b(\w)(\w*)/g,(_,a,b)=>a.toUpperCase()+b.toLowerCase()); }
 function toggle(t){ return t.split("").map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join(""); }
-function applyCase(text){
-  switch(sel.value){
-    case"sentence":return sentenceCase(text);
-    case"lower":return lower(text);
-    case"upper":return upper(text);
-    case"capital":return capital(text);
-    case"toggle":return toggle(text);
-  }
-  return text;
-}
+function applyCase(text){ switch(sel.value){ case"sentence":return sentenceCase(text); case"lower":return lower(text); case"upper":return upper(text); case"capital":return capital(text); case"toggle":return toggle(text);} return text; }
 
 function updateStats(){
   const t=txt.value;
@@ -253,13 +222,9 @@ function updateStats(){
 function highlightDuplicates(text){
   const words=text.toLowerCase().match(/\b\w+\b/g)||[];
   const counts={}; words.forEach(w=>counts[w]=(counts[w]||0)+1);
-  let highlighted = text.replace(/\b\w+\b/g, word=>{
-    return counts[word.toLowerCase()]>1
-      ? `<mark style="background:yellow;color:black;">${word}</mark>`
-      : word;
-  });
-  highlighted = highlighted.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;');
-  highlightLayer.innerHTML = highlighted;
+  let highlighted=text.replace(/\b\w+\b/g, word=>counts[word.toLowerCase()]>1? `<mark style="background:yellow;color:black;">${word}</mark>`:word);
+  highlighted=highlighted.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;');
+  highlightLayer.innerHTML=highlighted;
 }
 
 function updateDuplicates(text){
@@ -268,97 +233,47 @@ function updateDuplicates(text){
   const duplicates=Object.keys(counts).filter(k=>counts[k]>1);
   dup_count.textContent=duplicates.length;
   dup_table.innerHTML="";
-  if(duplicates.length){
-    duplicates.forEach(w=>{
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${w}</td><td>${counts[w]}</td>`;
-      dup_table.appendChild(tr);
-    });
-  } else{
-    dup_table.innerHTML=`<tr><td colspan="2">No duplicates</td></tr>`;
-  }
+  if(duplicates.length){ duplicates.forEach(w=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${w}</td><td>${counts[w]}</td>`; dup_table.appendChild(tr); }); }
+  else{ dup_table.innerHTML=`<tr><td colspan="2">No duplicates</td></tr>`; }
   highlightDuplicates(text);
 }
 
-/* CASE CHANGE */
-sel.addEventListener("change",()=>{ 
-  const s=txt.selectionStart,e=txt.selectionEnd;
-  txt.value=applyCase(txt.value);
-  txt.setSelectionRange(s,e);
-  updateStats(); 
-});
-
-/* INPUT (LIVE) */
-txt.addEventListener("input",()=>{ 
-  const s=txt.selectionStart,e=txt.selectionEnd;
-  if(sel.value==="sentence"){
-    const updated=applyCase(txt.value);
-    if(updated!==txt.value){
-      txt.value=updated;
-      txt.setSelectionRange(s,e);
-    }
-  }
-  updateStats();
-});
-
-/* CLEAR */
-document.getElementById("clearBtn").addEventListener("click",()=>{ 
-  txt.value=""; 
-  updateStats(); 
-});
+/* EVENTS */
+sel.addEventListener("change",()=>{ const s=txt.selectionStart,e=txt.selectionEnd; txt.value=applyCase(txt.value); txt.setSelectionRange(s,e); updateStats(); });
+txt.addEventListener("input",()=>{ const s=txt.selectionStart,e=txt.selectionEnd; if(sel.value==="sentence"){ const updated=applyCase(txt.value); if(updated!==txt.value){ txt.value=updated; txt.setSelectionRange(s,e); } } updateStats(); });
+document.getElementById("clearBtn").addEventListener("click",()=>{ txt.value=""; updateStats(); });
 
 /* COPY */
 const copyBtn=document.getElementById("copyBtn");
 const tooltip=document.getElementById("copyTooltip");
-
-copyBtn.addEventListener("click",()=>{
-  navigator.clipboard.writeText(txt.value).then(()=>{
-    const rect=copyBtn.getBoundingClientRect();
-    tooltip.style.top=rect.top-35+"px";
-    tooltip.style.left=rect.left+"px";
-    tooltip.classList.add("show");
-    setTimeout(()=>tooltip.classList.remove("show"),2000);
-  });
-});
+copyBtn.addEventListener("click",()=>{ navigator.clipboard.writeText(txt.value).then(()=>{ const rect=copyBtn.getBoundingClientRect(); tooltip.style.top=rect.top-35+"px"; tooltip.style.left=rect.left+"px"; tooltip.classList.add("show"); setTimeout(()=>tooltip.classList.remove("show"),2000); }); });
 
 /* DOWNLOAD */
 document.getElementById("downloadBtn").addEventListener("click",()=>{
   const text=txt.value;
   const format=document.getElementById("downloadFormat").value;
-
-  if(format==="txt"){
-    const blob=new Blob([text],{type:"text/plain"});
-    const a=document.createElement("a");
-    a.href=URL.createObjectURL(blob);
-    a.download="text.txt";
-    a.click();
-  }
-  else if(format==="pdf"){
-    const { jsPDF }=window.jspdf;
-    const doc=new jsPDF();
-    const lines=doc.splitTextToSize(text,180);
-    doc.text(lines,10,10);
-    doc.save("text.pdf");
-  }
-  else if(format==="doc"){
-    const blob=new Blob([text],{type:"application/msword"});
-    const a=document.createElement("a");
-    a.href=URL.createObjectURL(blob);
-    a.download="text.doc";
-    a.click();
-  }
-  else if(format==="xlsx"){
-    const ws=XLSX.utils.aoa_to_sheet(text.split(/\n/).map(l=>[l]));
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,"Sheet1");
-    XLSX.writeFile(wb,"text.xlsx");
-  }
+  if(format==="txt"){ const blob=new Blob([text],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="text.txt"; a.click(); }
+  else if(format==="pdf"){ const { jsPDF }=window.jspdf; const doc=new jsPDF(); const lines=doc.splitTextToSize(text,180); doc.text(lines,10,10); doc.save("text.pdf"); }
+  else if(format==="doc"){ const blob=new Blob([text],{type:"application/msword"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="text.doc"; a.click(); }
+  else if(format==="xlsx"){ const ws=XLSX.utils.aoa_to_sheet(text.split(/\n/).map(l=>[l])); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Sheet1"); XLSX.writeFile(wb,"text.xlsx"); }
 });
 
 /* DARK MODE */
-darkToggle.addEventListener("change",()=>{ 
-  document.body.classList.toggle("dark",darkToggle.checked);
-});
+darkToggle.addEventListener("change",()=>{ document.body.classList.toggle("dark",darkToggle.checked); });
+
+/* GST CALCULATOR */
+function gst(){
+  let T=+document.getElementById("total").value;
+  let P=+document.getElementById("percent").value;
+  let type=document.getElementById("type").value;
+  let base=T/(1+P/100),tax=T-base;
+  document.getElementById("result").innerHTML=
+    `Base: ₹${base.toFixed(2)}<br>`+
+    (type==="sc"?`SGST: ₹${(tax/2).toFixed(2)}<br>CGST: ₹${(tax/2).toFixed(2)}`:`IGST: ₹${tax.toFixed(2)}`)+
+    `<br><b>Total: ₹${T.toFixed(2)}</b>`;
+}
+
+/* HAMBURGER MENU */
 </script>
 
 </body>
