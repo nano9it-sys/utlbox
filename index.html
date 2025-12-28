@@ -2,94 +2,174 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>ToolBox All-in-One</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sentence Case & GST Calculator</title>
 
 <style>
-body { font-family: Arial, sans-serif; background: #f2f4f8; margin:0; transition: background 0.3s, color 0.3s; }
-body.dark { background:#1a1a1a; color:#fff; }
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
-/* NAV */
-.top-nav{ background:#007bff; color:#fff; display:flex; align-items:center; padding:14px 20px; position:sticky; top:0; z-index:100; }
-.logo{font-size:22px;font-weight:900;}
-.menu{margin-left:auto; display:flex; gap:12px;}
-.menu a{color:#fff; text-decoration:none; padding:8px 14px; border-radius:6px; font-weight:bold;}
-.menu a.active, .menu a:hover{background:rgba(255,255,255,.25);}
-.hamburger{display:none; margin-left:auto; font-size:26px; cursor:pointer;}
-@media(max-width:768px){ .menu{display:none; flex-direction:column; position:absolute; top:60px; right:10px; background:#007bff; padding:10px; border-radius:10px;} .menu.show{display:flex} .hamburger{display:block} }
+/* THEME COLORS */
+:root{
+    --bg:#0f2027;
+    --card:#24343c;
+    --text:#ffffff;
+    --accent:#4fc3ff;
+    --border:#2f4a54;
+}
+.light{
+    --bg:#f4f6f8;
+    --card:#ffffff;
+    --text:#000000;
+    --accent:#1a73e8;
+    --border:#dcdcdc;
+}
 
-/* APP */
-.page{display:none; justify-content:center; padding:30px;}
-.app-container { width:850px; background:#fff; border-radius:15px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,.15); }
-body.dark .app-container { background:#222; }
+/* GENERAL STYLES */
+*{box-sizing:border-box;}
+body{
+    margin:0;
+    font-family:Poppins,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding-top:60px; /* leave space for fixed nav */
+    transition: background 0.3s, color 0.3s;
+}
+a{cursor:pointer;}
 
-/* HEADER */
-.header-bar{ background:#007bff; padding:18px 20px; color:#fff; display:flex; align-items:center; justify-content:space-between; }
-.header-title{ font-size:28px; font-weight:900; margin:0; }
-.header-buttons{ display:flex; gap:10px; }
-.undo-redo-btn{ background:white; border:none; padding:6px 14px; font-size:15px; border-radius:6px; cursor:pointer; font-weight:bold; color:#007bff; border:2px solid #fff; }
-.undo-redo-btn:hover{ background:#e3e3e3; }
+/* NAVIGATION */
+.top-nav{
+    position:fixed; top:0; left:0; right:0;
+    background:var(--card);
+    display:flex; align-items:center;
+    padding:12px 20px;
+    gap:15px;
+    z-index:1000;
+    flex-wrap:wrap;
+}
+.top-nav .logo{ font-weight:600; font-size:20px; }
+.top-nav .menu a{
+    text-decoration:none; padding:6px 12px; border-radius:6px;
+    color:var(--text); font-weight:500;
+}
+.top-nav .menu a.active, .top-nav .menu a:hover{
+    background:var(--accent); color:#000;
+}
+.top-nav button{
+    margin-left:auto; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; background:var(--accent); color:#000; font-weight:500;
+}
+
+/* PAGE STYLE */
+.page{ display:none; padding:30px; max-width:1200px; margin:auto; }
+.page.active{ display:block; }
+
+/* CARD STYLE FOR CHAR COUNTER & GST */
+.app-container{
+    background:var(--card);
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,.25);
+    margin-bottom:20px;
+    transition: background 0.3s, color 0.3s;
+}
 
 /* TOOLBAR */
-.toolbar { background: #007bff; padding: 12px 20px; display: flex; flex-wrap: nowrap; gap: 10px; align-items: center; color: #fff; overflow-x: auto; }
-select, button, #charBox { height: 40px; padding: 0 12px; border-radius: 8px; font-weight: bold; font-size: 15px; border: none; }
-select { border:2px solid black; }
-button { background:white; cursor:pointer; border:2px solid #ccc; }
-#clearBtn { color:red; }
-#charBox { background:#ffeb3b; color:#007bff; text-transform:capitalize; box-shadow:0 3px 8px rgba(0,0,0,0.2); font-weight:bold; display:flex; align-items:center; }
-.toggle-label{ display:flex; align-items:center; gap:5px; font-weight:bold; }
+.toolbar{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
+.toolbar select, .toolbar button{ padding:8px 12px; border-radius:6px; border:none; font-size:14px; cursor:pointer; }
+#textInput{ width:100%; height:250px; padding:12px; border-radius:8px; border:none; resize:vertical; font-size:15px; background:rgba(255,255,255,0.1); color:var(--text); }
 
-/* TEXTAREA */
-.textarea-wrapper { position:relative; width:100%; max-height:400px; }
-#highlightLayer { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; padding:20px; white-space:pre-wrap; word-wrap:break-word; color:transparent; z-index:1; line-height:1.5; box-sizing:border-box; }
-#textInput { position:relative; width:100%; height:300px; padding:20px; border:none; border-top:2px solid #ddd; font-size:17px; line-height:1.5; resize:vertical; outline:none; background:transparent; color:#000; z-index:2; box-sizing:border-box; }
-body.dark #textInput { color:#fff; border-color:#444; }
-
-/* STATS */
-.stats-bar { background:#007bff; padding:15px; display:flex; justify-content:space-around; color:#fff; font-size:16px; font-weight:bold; }
-
-/* DUPLICATES */
-.duplicates-panel { background:#e3f2fd; padding:10px 15px; border-top:2px solid #007bff; font-size:14px; color:#000; }
-body.dark .duplicates-panel { background:#333; color:#fff; }
-.duplicates-panel b { color:red; }
-.dup-table-wrapper { max-height:150px; overflow-y:auto; margin-top:5px; }
-.dup-table-wrapper table { width:100%; border-collapse:collapse; font-size:13px; }
-.dup-table-wrapper th, .dup-table-wrapper td { border:1px solid #007bff; padding:5px; text-align:left; }
-.dup-table-wrapper th { background:#007bff; color:white; position:sticky; top:0; z-index:2; }
-body.dark .dup-table-wrapper th { background:#555; color:#fff; }
+/* STATS & DUPLICATES */
+.stats-bar{ display:flex; justify-content:space-around; padding:10px; font-weight:500; margin-top:10px; flex-wrap:wrap; }
+.duplicates-panel{ margin-top:12px; font-size:13px; }
+.dup-table-wrapper table{ width:100%; border-collapse:collapse; font-size:13px; }
+.dup-table-wrapper th, .dup-table-wrapper td{ border:1px solid var(--border); padding:5px; text-align:left; }
+.dup-table-wrapper th{ background:var(--accent); color:#000; }
+.dup-table-wrapper td{ background:var(--card); color:var(--text); }
 
 /* GST BOX */
-.gst-box{ width:850px; background:#fff; padding:25px; border-radius:15px; box-shadow:0 6px 20px rgba(0,0,0,.15); margin-top:20px;}
-.gst-box input,.gst-box select{ width:100%; height:40px; margin-bottom:12px; padding:0 10px; }
+.gst-box input, .gst-box select, .gst-box button{
+    width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:none; font-size:14px; cursor:pointer;
+}
 
 /* COPY TOOLTIP */
-.copy-tooltip{ visibility:hidden; background-color:#4caf50; color:white; padding:5px 10px; border-radius:5px; font-size:13px; position:absolute; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:1000; }
+.copy-tooltip{
+    visibility:hidden; background-color:#4caf50; color:white; padding:5px 10px; border-radius:5px; font-size:13px;
+    position:absolute; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:1000;
+}
 .copy-tooltip.show{ visibility:visible; opacity:1; }
+
+/* === LOCAL FILE SEARCH STYLES (UNCHANGED) === */
+#controls{
+    position:relative;
+    background:linear-gradient(180deg,rgba(0,0,0,.05),transparent);
+    backdrop-filter:blur(12px);
+    padding:14px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-bottom:20px;
+}
+#controls::after{
+    content:"";
+    position:absolute;
+    left:0;right:0;bottom:0;
+    height:3px;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);
+    animation:dividerMove 3s linear infinite;
+}
+@keyframes dividerMove{
+    0%{background-position:0%}
+    100%{background-position:200%}
+}
+input,select,button{
+    padding:9px 12px;
+    border-radius:8px;
+    border:none;
+    font-family:inherit;
+}
+input,select{
+    background:rgba(255,255,255,.18);
+    color:var(--text);
+}
+select{ appearance:none; }
+select option{ background:#24343c; color:#fff; }
+body.light select, body.light select option{ background:#fff; color:#000; }
+button{ background:var(--accent); color:#fff; cursor:pointer; }
+.toggle{background:#ff9800}
+h1{text-align:center;margin:14px 0 4px;letter-spacing:1.5px;font-weight:600;position:relative;animation:fadeUp .9s ease forwards;opacity:0;}
+h1::before{content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:-8px;width:60%;height:18px;background:radial-gradient(circle,var(--accent),transparent 70%);filter:blur(12px);opacity:.6;}
+h1::after{content:"";display:block;margin:10px auto 0;width:160px;height:4px;border-radius:4px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+#folderPath,#fileCount{text-align:center;font-size:13px;opacity:.85;}
+#results{max-width:1150px;margin:24px auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
+.result-card{background:var(--card);padding:14px;border-radius:14px;cursor:pointer;border:1px solid var(--border);transition:all .25s ease;}
+body.light .result-card{box-shadow:0 6px 18px rgba(0,0,0,.08);}
+.result-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.25);}
+.file-row{display:flex;gap:12px;}
+.icon{font-size:26px}
+small{font-size:12px;opacity:.8}
+.action-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px;}
+.download-btn{background:#34a853;padding:6px 10px;font-size:12px;border-radius:6px;}
+.highlight{background:#ffe066;color:#000;padding:0 4px;border-radius:4px;}
+#chartWrap{max-width:1150px;margin:30px auto;background:var(--card);padding:14px;border-radius:14px;}
 </style>
 </head>
-<body>
+<body class="light">
 
 <nav class="top-nav">
   <div class="logo">ToolBox</div>
-  <div class="hamburger" onclick="menuToggle()">☰</div>
-  <div class="menu" id="menu">
-    <a href="#sentence-case">Character Counter</a>
-    <a href="#gst-calculator">GST Calculator</a>
+  <div class="menu">
+    <a onclick="switchPage('char-counter', this)" class="active">Character Counter</a>
+    <a onclick="switchPage('gst-calculator', this)">GST Calculator</a>
+    <a onclick="switchPage('file-search', this)">Local File Search</a>
   </div>
+  <button onclick="toggleTheme()">Dark / Light</button>
 </nav>
 
-<!-- SENTENCE CASE -->
-<section id="sentence-case" class="page">
+<!-- Character Counter -->
+<section id="char-counter" class="page active">
 <div class="app-container">
-
-<div class="header-bar">
-    <h1 class="header-title">Sentence Case Character Counter</h1>
-    <div class="header-buttons">
-      <button class="undo-redo-btn" onclick="undoText()">↶ Undo</button>
-      <button class="undo-redo-btn" onclick="redoText()">↷ Redo</button>
-    </div>
-</div>
-
+<h2>Character Counter</h2>
 <div class="toolbar">
   <select id="caseSelect">
     <option value="sentence">Sentence case</option>
@@ -98,12 +178,10 @@ body.dark .dup-table-wrapper th { background:#555; color:#fff; }
     <option value="capital">Capitalize Each Word</option>
     <option value="toggle">tOGGLE cASE</option>
   </select>
-
   <button id="clearBtn">Clear</button>
-  <div id="charBox">0 characters</div>
+  <button onclick="undoText()">↶ Undo</button>
+  <button onclick="redoText()">↷ Redo</button>
   <button id="copyBtn">Copy</button>
-  <span id="copyTooltip" class="copy-tooltip">Copied!</span>
-
   <select id="downloadFormat">
     <option value="txt">Text (.txt)</option>
     <option value="pdf">PDF (.pdf)</option>
@@ -111,102 +189,122 @@ body.dark .dup-table-wrapper th { background:#555; color:#fff; }
     <option value="xlsx">Excel (.xlsx)</option>
   </select>
   <button id="downloadBtn">Download</button>
-
-  <label class="toggle-label">
-    <input type="checkbox" id="darkToggle"> Dark
-  </label>
+  <span id="copyTooltip" class="copy-tooltip">Copied!</span>
 </div>
-
-<div class="textarea-wrapper">
-  <div id="highlightLayer"></div>
-  <textarea id="textInput" placeholder="Type your text here..."></textarea>
-</div>
-
+<textarea id="textInput" placeholder="Type your text here..."></textarea>
 <div class="stats-bar">
-  <span>CHARS <b id="s_chars">0</b></span>
-  <span>WORDS <b id="s_words">0</b></span>
-  <span>SENTENCES <b id="s_sent">0</b></span>
-  <span>PARA <b id="s_para">0</b></span>
-  <span>SPACES <b id="s_space">0</b></span>
+  <span>Chars: <b id="s_chars">0</b></span>
+  <span>Words: <b id="s_words">0</b></span>
+  <span>Sentences: <b id="s_sent">0</b></span>
+  <span>Paragraphs: <b id="s_para">0</b></span>
+  <span>Spaces: <b id="s_space">0</b></span>
 </div>
-
 <div class="duplicates-panel">
-  <span>Duplicate Words Count: <b id="dup_count">0</b></span>
+  <span>Duplicate Words: <b id="dup_count">0</b></span>
   <div class="dup-table-wrapper">
-    <table id="dup_table">
-      <thead><tr><th>Word</th><th>Count</th></tr></thead>
-      <tbody><tr><td colspan="2">No duplicates</td></tr></tbody>
-    </table>
+    <table id="dup_table"><thead><tr><th>Word</th><th>Count</th></tr></thead><tbody><tr><td colspan="2">No duplicates</td></tr></tbody></table>
   </div>
 </div>
-
 </div>
 </section>
 
-<!-- GST CALCULATOR -->
+<!-- GST Calculator -->
 <section id="gst-calculator" class="page">
-<div class="gst-box">
-  <h2>GST Calculator</h2>
-  <input id="total" type="number" placeholder="Total Amount (GST Included)">
-  <select id="percent">
-    <option value="5">5%</option>
-    <option value="12">12%</option>
-    <option value="18">18%</option>
-    <option value="28">28%</option>
-  </select>
-  <select id="type">
-    <option value="sc">SGST + CGST</option>
-    <option value="ig">IGST</option>
-  </select>
-  <button onclick="gst()">Calculate</button>
-  <div id="result"></div>
+<div class="app-container gst-box">
+<h2>GST Calculator</h2>
+<input id="total" type="number" placeholder="Total Amount (GST Included)">
+<select id="percent">
+  <option value="5">5%</option>
+  <option value="12">12%</option>
+  <option value="18">18%</option>
+  <option value="28">28%</option>
+</select>
+<select id="type">
+  <option value="sc">SGST + CGST</option>
+  <option value="ig">IGST</option>
+</select>
+<button onclick="gst()">Calculate</button>
+<div id="result"></div>
 </div>
 </section>
 
-<!-- LIBS -->
+<!-- Local File Search -->
+<section id="file-search" class="page">
+<h1>Advanced Local File Search</h1>
+<div id="folderPath">No folder selected</div>
+<div id="fileCount"></div>
+<div id="controls">
+  <input type="file" id="folderInput" webkitdirectory multiple>
+  <input type="text" id="searchBox" placeholder="Search files..." disabled>
+  <select id="fileType" disabled>
+    <option value="">All types</option>
+    <option value=".txt">TXT</option>
+    <option value=".pdf">PDF</option>
+    <option value=".js">JS</option>
+    <option value=".html">HTML</option>
+    <option value=".css">CSS</option>
+    <option value=".xlsx">XLSX</option>
+    <option value=".docs">DOCS</option>
+    <option value=".exe">EXE</option>
+    <option value=".jpg">JPG</option>
+    <option value=".png">PNG</option>
+    <option value=".jpeg">JPEG</option>
+    <option value=".webp">WEBP</option>
+    <option value=".gif">GIF</option>
+  </select>
+  <select id="sortBy" disabled>
+    <option value="date">Date</option>
+    <option value="name">Name</option>
+    <option value="size">Size</option>
+  </select>
+  <select id="sortOrder" disabled>
+    <option value="desc">Desc</option>
+    <option value="asc">Asc</option>
+  </select>
+  <button onclick="updateResults()">Search</button>
+</div>
+<div id="results"></div>
+<div id="chartWrap"><canvas id="sizeChart" height="160"></canvas></div>
+</section>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 <script>
-/* NAVIGATION */
-function menuToggle(){ document.getElementById("menu").classList.toggle("show") }
-function showPage(){
-  let h=location.hash||"#sentence-case";
-  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
-  document.querySelector(h).style.display="flex";
-  document.querySelectorAll(".menu a").forEach(a=>a.classList.remove("active"));
-  document.querySelector(`.menu a[href='${h}']`).classList.add("active");
+/* === PAGE SWITCHING === */
+function switchPage(id, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.menu a').forEach(a=>a.classList.remove('active'));
+  el.classList.add('active');
 }
-window.addEventListener("hashchange",showPage);
-showPage();
 
-/* UNDO/REDO */
+/* === DARK/LIGHT THEME === */
+function toggleTheme(){ document.body.classList.toggle('light'); localStorage.setItem('theme', document.body.className);}
+document.body.className = localStorage.getItem('theme') || "light";
+
+/* === CHARACTER COUNTER FUNCTIONS === */
 let undoStack=[], redoStack=[];
 const txt=document.getElementById("textInput");
-function saveState(){ undoStack.push(txt.value); if(undoStack.length>100) undoStack.shift(); }
-function undoText(){ if(!undoStack.length) return; redoStack.push(txt.value); txt.value=undoStack.pop(); updateStats(); }
-function redoText(){ if(!redoStack.length) return; undoStack.push(txt.value); txt.value=redoStack.pop(); updateStats(); }
-txt.addEventListener("input",()=>{ saveState(); });
-
-/* CASE FUNCTIONS */
 const sel=document.getElementById("caseSelect");
-const charBox=document.getElementById("charBox");
-const darkToggle=document.getElementById("darkToggle");
-const s_chars=document.getElementById("s_chars");
+const charBox=document.getElementById("s_chars");
 const s_words=document.getElementById("s_words");
 const s_sent=document.getElementById("s_sent");
 const s_para=document.getElementById("s_para");
 const s_space=document.getElementById("s_space");
 const dup_count=document.getElementById("dup_count");
 const dup_table=document.getElementById("dup_table").querySelector("tbody");
-const highlightLayer=document.getElementById("highlightLayer");
+
+function saveState(){ undoStack.push(txt.value); if(undoStack.length>100) undoStack.shift(); }
+function undoText(){ if(!undoStack.length) return; redoStack.push(txt.value); txt.value=undoStack.pop(); updateStats(); }
+function redoText(){ if(!redoStack.length) return; undoStack.push(txt.value); txt.value=redoStack.pop(); updateStats(); }
+txt.addEventListener("input",()=>{ saveState(); updateStats(); });
 
 function sentenceCase(t){ t=t.toLowerCase(); return t.replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g,m=>m.toUpperCase()); }
 function lower(t){ return t.toLowerCase(); }
 function upper(t){ return t.toUpperCase(); }
 function capital(t){ return t.replace(/\b(\w)(\w*)/g,(_,a,b)=>a.toUpperCase()+b.toLowerCase()); }
-function toggle(t){ return t.split("").map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join(""); }
-function applyCase(text){ switch(sel.value){ case"sentence":return sentenceCase(text); case"lower":return lower(text); case"upper":return upper(text); case"capital":return capital(text); case"toggle":return toggle(text);} return text; }
+function toggleCase(t){ return t.split("").map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join(""); }
+function applyCase(text){ switch(sel.value){ case"sentence":return sentenceCase(text); case"lower":return lower(text); case"upper":return upper(text); case"capital":return capital(text); case"toggle":return toggleCase(text);} return text; }
 
 function updateStats(){
   const t=txt.value;
@@ -215,16 +313,7 @@ function updateStats(){
   s_sent.textContent=t.split(/[.!?]+/).filter(Boolean).length;
   s_para.textContent=t.split(/\n+/).filter(Boolean).length;
   s_space.textContent=(t.match(/ /g)||[]).length;
-  charBox.textContent=t.length+" characters";
   updateDuplicates(t);
-}
-
-function highlightDuplicates(text){
-  const words=text.toLowerCase().match(/\b\w+\b/g)||[];
-  const counts={}; words.forEach(w=>counts[w]=(counts[w]||0)+1);
-  let highlighted=text.replace(/\b\w+\b/g, word=>counts[word.toLowerCase()]>1? `<mark style="background:yellow;color:black;">${word}</mark>`:word);
-  highlighted=highlighted.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;');
-  highlightLayer.innerHTML=highlighted;
 }
 
 function updateDuplicates(text){
@@ -235,48 +324,106 @@ function updateDuplicates(text){
   dup_table.innerHTML="";
   if(duplicates.length){ duplicates.forEach(w=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${w}</td><td>${counts[w]}</td>`; dup_table.appendChild(tr); }); }
   else{ dup_table.innerHTML=`<tr><td colspan="2">No duplicates</td></tr>`; }
-  highlightDuplicates(text);
 }
 
-/* EVENTS */
-sel.addEventListener("change",()=>{ const s=txt.selectionStart,e=txt.selectionEnd; txt.value=applyCase(txt.value); txt.setSelectionRange(s,e); updateStats(); });
-txt.addEventListener("input",()=>{ const s=txt.selectionStart,e=txt.selectionEnd; if(sel.value==="sentence"){ const updated=applyCase(txt.value); if(updated!==txt.value){ txt.value=updated; txt.setSelectionRange(s,e); } } updateStats(); });
-document.getElementById("clearBtn").addEventListener("click",()=>{ txt.value=""; updateStats(); });
-
-/* COPY */
-const copyBtn=document.getElementById("copyBtn");
-const tooltip=document.getElementById("copyTooltip");
-copyBtn.addEventListener("click",()=>{ navigator.clipboard.writeText(txt.value).then(()=>{ const rect=copyBtn.getBoundingClientRect(); tooltip.style.top=rect.top-35+"px"; tooltip.style.left=rect.left+"px"; tooltip.classList.add("show"); setTimeout(()=>tooltip.classList.remove("show"),2000); }); });
-
-/* DOWNLOAD */
-document.getElementById("downloadBtn").addEventListener("click",()=>{
-  const text=txt.value;
-  const format=document.getElementById("downloadFormat").value;
-  if(format==="txt"){ const blob=new Blob([text],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="text.txt"; a.click(); }
-  else if(format==="pdf"){ const { jsPDF }=window.jspdf; const doc=new jsPDF(); const lines=doc.splitTextToSize(text,180); doc.text(lines,10,10); doc.save("text.pdf"); }
-  else if(format==="doc"){ const blob=new Blob([text],{type:"application/msword"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="text.doc"; a.click(); }
-  else if(format==="xlsx"){ const ws=XLSX.utils.aoa_to_sheet(text.split(/\n/).map(l=>[l])); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Sheet1"); XLSX.writeFile(wb,"text.xlsx"); }
+/* COPY & DOWNLOAD */
+document.getElementById("copyBtn").addEventListener("click",()=>{
+    navigator.clipboard.writeText(txt.value).then(()=>{
+        const tooltip=document.getElementById("copyTooltip");
+        tooltip.classList.add("show");
+        setTimeout(()=>tooltip.classList.remove("show"),2000);
+    });
 });
-
-/* DARK MODE */
-darkToggle.addEventListener("change",()=>{ document.body.classList.toggle("dark",darkToggle.checked); });
+document.getElementById("downloadBtn").addEventListener("click",()=>{
+    const text=txt.value;
+    const format=document.getElementById("downloadFormat").value;
+    if(format==="txt"){ const blob=new Blob([text],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="text.txt"; a.click();}
+    else if(format==="pdf"){ const { jsPDF }=window.jspdf; const doc=new jsPDF(); const lines=doc.splitTextToSize(text,180); doc.text(lines,10,10); doc.save("text.pdf");}
+    else if(format==="doc"){ const blob=new Blob([text],{type:"application/msword"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="text.doc"; a.click();}
+    else if(format==="xlsx"){ const ws=XLSX.utils.aoa_to_sheet(text.split(/\n/).map(l=>[l])); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Sheet1"); XLSX.writeFile(wb,"text.xlsx");}
+});
+sel.addEventListener("change",()=>{ txt.value=applyCase(txt.value); updateStats(); });
 
 /* GST CALCULATOR */
 function gst(){
-  let T=+document.getElementById("total").value;
-  let P=+document.getElementById("percent").value;
-  let type=document.getElementById("type").value;
-  let base=T/(1+P/100),tax=T-base;
-  document.getElementById("result").innerHTML=
-    `Base: ₹${base.toFixed(2)}<br>`+
-    (type==="sc"?`SGST: ₹${(tax/2).toFixed(2)}<br>CGST: ₹${(tax/2).toFixed(2)}`:`IGST: ₹${tax.toFixed(2)}`)+
-    `<br><b>Total: ₹${T.toFixed(2)}</b>`;
+    let T=+document.getElementById("total").value;
+    let P=+document.getElementById("percent").value;
+    let type=document.getElementById("type").value;
+    if(!T) return;
+    let base=T/(1+P/100), tax=T-base;
+    document.getElementById("result").innerHTML=
+        `Base: ₹${base.toFixed(2)}<br>`+
+        (type==="sc"?`SGST: ₹${(tax/2).toFixed(2)}<br>CGST: ₹${(tax/2).toFixed(2)}`:`IGST: ₹${tax.toFixed(2)}`)+
+        `<br><b>Total: ₹${T.toFixed(2)}</b>`;
 }
 
-/* HAMBURGER MENU */
-</script>
+/* === LOCAL FILE SEARCH FUNCTIONS === */
+let filesData=[];
+const folderInput2=document.getElementById("folderInput");
+const searchBox2=document.getElementById("searchBox");
+const fileType2=document.getElementById("fileType");
+const sortBy2=document.getElementById("sortBy");
+const sortOrder2=document.getElementById("sortOrder");
+const folderPath2=document.getElementById("folderPath");
+const fileCount2=document.getElementById("fileCount");
+const results2=document.getElementById("results");
+const sizeChart2=document.getElementById("sizeChart");
 
+const esc=t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+const highlight2=(t,k)=>k?t.replace(new RegExp(`(${esc(k)})`,"gi"),`<span class="highlight">$1</span>`):t;
+const sizeFmt=b=>b>1048576?(b/1048576).toFixed(1)+" MB":(b/1024).toFixed(1)+" KB";
+const icon=n=>/pdf/i.test(n)?"📕":/jpg|png|jpeg|gif/i.test(n)?"🖼️":/exe/i.test(n)?"⚙️":"📄";
+
+folderInput2.onchange=e=>{
+    filesData=[];
+    const f=e.target.files;
+    if(!f.length) return;
+    folderPath2.innerText="Selected Folder: "+f[0].webkitRelativePath.split("/")[0];
+    for(let x of f){ filesData.push({file:x,name:x.name,path:x.webkitRelativePath,size:x.size,lastModified:x.lastModified}); }
+    searchBox2.disabled=fileType2.disabled=sortBy2.disabled=sortOrder2.disabled=false;
+};
+searchBox2.oninput=updateResults;
+
+function updateResults(){
+    const key=searchBox2.value.toLowerCase();
+    let list=[...filesData];
+    if(key) list=list.filter(f=>f.name.toLowerCase().includes(key)||f.path.toLowerCase().includes(key));
+    if(fileType2.value) list=list.filter(f=>f.name.endsWith(fileType2.value));
+    list.sort((a,b)=>{
+        let v=sortBy2.value==="name"?a.name.localeCompare(b.name):
+              sortBy2.value==="size"?a.size-b.size:
+              a.lastModified-b.lastModified;
+        return sortOrder2.value==="asc"?v:-v;
+    });
+    fileCount2.innerText="Total Files: "+list.length;
+    results2.innerHTML="";
+    list.forEach(f=>{
+        const card=document.createElement("div");
+        card.className="result-card";
+        card.ondblclick=()=>window.open(URL.createObjectURL(f.file));
+        card.innerHTML=`
+        <div class="file-row">
+            <div class="icon">${icon(f.name)}</div>
+            <div><strong>${highlight2(f.name,key)}</strong><br><small>${highlight2(f.path,key)}</small></div>
+        </div>
+        <div class="action-row">
+            <span>${sizeFmt(f.size)}</span>
+            <span>${new Date(f.lastModified).toLocaleString()}</span>
+            <button class="download-btn">Download</button>
+        </div>`;
+        card.querySelector(".download-btn").onclick=e=>{ e.stopPropagation(); const a=document.createElement("a"); a.href=URL.createObjectURL(f.file); a.download=f.name; a.click();};
+        results2.appendChild(card);
+    });
+    drawChart(list);
+}
+function drawChart(list){
+    const c=sizeChart2,ctx=c.getContext("2d");
+    ctx.clearRect(0,0,c.width,c.height);
+    if(!list.length)return;
+    const max=Math.max(...list.map(f=>f.size));
+    const w=c.width/list.length;
+    list.forEach((f,i)=>{ const h=(f.size/max)*(c.height-20); ctx.fillStyle="#4fc3ff"; ctx.fillRect(i*w,c.height-h,w-3,h); });
+}
+</script>
 </body>
 </html>
-
-
