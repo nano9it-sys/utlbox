@@ -2,241 +2,504 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ToolBox All-in-One</title>
+<title>ToolBox — All-in-One</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-
-/* THEME COLORS */
-:root{
-    --bg:#0f2027;
-    --card:#24343c;
-    --text:#ffffff;
-    --accent:#4fc3ff;
-    --border:#2f4a54;
+/* ─── TOKENS ─────────────────────────────────────────── */
+:root {
+  --bg:       #080c14;
+  --surface:  rgba(255,255,255,0.04);
+  --glass:    rgba(255,255,255,0.07);
+  --border:   rgba(255,255,255,0.09);
+  --text:     #e8eef8;
+  --muted:    rgba(232,238,248,0.45);
+  --cyan:     #00e5ff;
+  --teal:     #00bfae;
+  --amber:    #ffb547;
+  --rose:     #ff5f7e;
+  --nav-h:    68px;
+  --radius:   18px;
+  --shadow:   0 24px 60px rgba(0,0,0,0.55);
 }
-.light{
-    --bg:#f4f6f8;
-    --card:#ffffff;
-    --text:#000000;
-    --accent:#1a73e8;
-    --border:#dcdcdc;
-}
-
-/* GENERAL STYLES */
-*{box-sizing:border-box;}
-body{
-    margin:0;
-    font-family:Poppins,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    padding-top:60px; /* leave space for fixed nav */
-    transition: background 0.3s, color 0.3s;
-}
-a{cursor:pointer;}
-
-/* NAVIGATION */
-.top-nav{
-    position:fixed; top:0; left:0; right:0;
-    background:var(--card);
-    display:flex; align-items:center;
-    padding:12px 20px;
-    gap:15px;
-    z-index:1000;
-    flex-wrap:wrap;
-}
-.top-nav .logo{ font-weight:600; font-size:20px; }
-.top-nav .menu a{
-    text-decoration:none; padding:6px 12px; border-radius:6px;
-    color:var(--text); font-weight:500;
-}
-.top-nav .menu a.active, .top-nav .menu a:hover{
-    background:var(--accent); color:#000;
-}
-.top-nav button{
-    margin-left:auto; padding:6px 12px; border:none; border-radius:6px; cursor:pointer; background:var(--accent); color:#000; font-weight:500;
+.light {
+  --bg:      #f0f4fb;
+  --surface: rgba(255,255,255,0.75);
+  --glass:   rgba(255,255,255,0.90);
+  --border:  rgba(0,0,0,0.08);
+  --text:    #0d1117;
+  --muted:   rgba(13,17,23,0.50);
+  --shadow:  0 12px 40px rgba(0,0,0,0.12);
 }
 
-/* PAGE STYLE */
-.page{ display:none; padding:30px; max-width:1200px; margin:auto; }
-.page.active{ display:block; }
-
-/* CARD STYLE FOR CHAR COUNTER & GST */
-.app-container{
-    background:var(--card);
-    padding:20px;
-    border-radius:14px;
-    box-shadow:0 6px 18px rgba(0,0,0,.25);
-    margin-bottom:20px;
-    transition: background 0.3s, color 0.3s;
+/* ─── RESET ───────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-top: var(--nav-h);
+  transition: background .4s, color .4s;
+  overflow-x: hidden;
 }
 
-/* TOOLBAR */
-.toolbar{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
-.toolbar select, .toolbar button{ padding:8px 12px; border-radius:6px; border:none; font-size:14px; cursor:pointer; }
-#textInput{ width:100%; height:250px; padding:12px; border-radius:8px; border:none; resize:vertical; font-size:15px; background:rgba(255,255,255,0.1); color:var(--text); }
+/* ─── BACKGROUND ORBS ─────────────────────────────────── */
+.orbs { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.orb {
+  position:absolute; border-radius:50%;
+  filter: blur(90px); opacity: .18;
+  animation: drift 18s ease-in-out infinite alternate;
+}
+.orb1 { width:520px;height:520px; background:var(--cyan);  top:-100px; left:-120px; animation-duration:20s;}
+.orb2 { width:420px;height:420px; background:var(--teal);  bottom:-80px; right:-100px; animation-duration:24s; animation-delay:-6s;}
+.orb3 { width:280px;height:280px; background:var(--amber); top:40%; left:55%; animation-duration:16s; animation-delay:-10s;}
+@keyframes drift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(40px,30px) scale(1.12); }
+}
+.light .orb { opacity:.10; }
 
-/* STATS & DUPLICATES */
-.stats-bar{ display:flex; justify-content:space-around; padding:10px; font-weight:500; margin-top:10px; flex-wrap:wrap; }
-.duplicates-panel{ margin-top:12px; font-size:13px; }
-.dup-table-wrapper table{ width:100%; border-collapse:collapse; font-size:13px; }
-.dup-table-wrapper th, .dup-table-wrapper td{ border:1px solid var(--border); padding:5px; text-align:left; }
-.dup-table-wrapper th{ background:var(--accent); color:#000; }
-.dup-table-wrapper td{ background:var(--card); color:var(--text); }
-
-/* GST BOX */
-.gst-box input, .gst-box select, .gst-box button{
-    width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:none; font-size:14px; cursor:pointer;
+/* ─── NOISE OVERLAY ───────────────────────────────────── */
+body::before {
+  content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.025; background-size:160px;
 }
 
-/* COPY TOOLTIP */
-.copy-tooltip{
-    visibility:hidden; background-color:#4caf50; color:white; padding:5px 10px; border-radius:5px; font-size:13px;
-    position:absolute; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:1000;
+/* ─── NAV ─────────────────────────────────────────────── */
+.nav {
+  position:fixed; top:0; left:0; right:0; height:var(--nav-h);
+  display:flex; align-items:center; gap:10px; padding:0 28px;
+  background: rgba(8,12,20,0.72);
+  backdrop-filter: blur(22px);
+  border-bottom: 1px solid var(--border);
+  z-index:100;
 }
-.copy-tooltip.show{ visibility:visible; opacity:1; }
+.light .nav { background: rgba(240,244,251,0.82); }
 
-/* === LOCAL FILE SEARCH STYLES (UNCHANGED) === */
-#controls{
-    position:relative;
-    background:linear-gradient(180deg,rgba(0,0,0,.05),transparent);
-    backdrop-filter:blur(12px);
-    padding:14px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    justify-content:center;
-    margin-bottom:20px;
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 22px;
+  background: linear-gradient(135deg, var(--cyan), var(--teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  margin-right: 8px;
+  white-space: nowrap;
 }
-#controls::after{
-    content:"";
-    position:absolute;
-    left:0;right:0;bottom:0;
-    height:3px;
-    background:linear-gradient(90deg,transparent,var(--accent),transparent);
-    animation:dividerMove 3s linear infinite;
+
+.nav-tabs { display:flex; gap:4px; background:var(--surface); border-radius:12px; padding:4px; border:1px solid var(--border); }
+.nav-tab {
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+  padding:7px 16px; border-radius:9px; border:none; cursor:pointer;
+  background:transparent; color:var(--muted);
+  transition: all .22s ease; white-space:nowrap;
 }
-@keyframes dividerMove{
-    0%{background-position:0%}
-    100%{background-position:200%}
+.nav-tab:hover { color:var(--text); background:var(--glass); }
+.nav-tab.active { background:linear-gradient(135deg,var(--cyan),var(--teal)); color:#080c14; font-weight:600; box-shadow:0 4px 14px rgba(0,229,255,.3);}
+
+.nav-theme {
+  margin-left:auto; background:var(--surface); border:1px solid var(--border);
+  color:var(--muted); font-size:18px; padding:7px 10px; border-radius:10px;
+  cursor:pointer; transition: all .22s; line-height:1;
 }
-input,select,button{
-    padding:9px 12px;
-    border-radius:8px;
-    border:none;
-    font-family:inherit;
+.nav-theme:hover { color:var(--text); border-color:var(--cyan); }
+
+/* ─── PAGES ───────────────────────────────────────────── */
+.page { display:none; position:relative; z-index:2; padding:36px 28px; max-width:1180px; margin:auto; }
+.page.active { display:block; animation: pageIn .35s ease; }
+@keyframes pageIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── SECTION HEADER ──────────────────────────────────── */
+.section-header {
+  display:flex; align-items:baseline; gap:14px; margin-bottom:28px;
 }
-input,select{
-    background:rgba(255,255,255,.18);
-    color:var(--text);
+.section-title {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:28px; letter-spacing:-0.5px;
 }
-select{ appearance:none; }
-select option{ background:#24343c; color:#fff; }
-body.light select, body.light select option{ background:#fff; color:#000; }
-button{ background:var(--accent); color:#fff; cursor:pointer; }
-.toggle{background:#ff9800}
-h1{text-align:center;margin:14px 0 4px;letter-spacing:1.5px;font-weight:600;position:relative;animation:fadeUp .9s ease forwards;opacity:0;}
-h1::before{content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:-8px;width:60%;height:18px;background:radial-gradient(circle,var(--accent),transparent 70%);filter:blur(12px);opacity:.6;}
-h1::after{content:"";display:block;margin:10px auto 0;width:160px;height:4px;border-radius:4px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-#folderPath,#fileCount{text-align:center;font-size:13px;opacity:.85;}
-#results{max-width:1150px;margin:24px auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;}
-.result-card{background:var(--card);padding:14px;border-radius:14px;cursor:pointer;border:1px solid var(--border);transition:all .25s ease;}
-body.light .result-card{box-shadow:0 6px 18px rgba(0,0,0,.08);}
-.result-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.25);}
-.file-row{display:flex;gap:12px;}
-.icon{font-size:26px}
-small{font-size:12px;opacity:.8}
-.action-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px;}
-.download-btn{background:#34a853;padding:6px 10px;font-size:12px;border-radius:6px;}
-.highlight{background:#ffe066;color:#000;padding:0 4px;border-radius:4px;}
-#chartWrap{max-width:1150px;margin:30px auto;background:var(--card);padding:14px;border-radius:14px;}
+.section-badge {
+  font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px;
+  padding:3px 10px; border-radius:20px;
+  background:linear-gradient(135deg,var(--cyan),var(--teal));
+  color:#080c14;
+}
+
+/* ─── GLASS CARD ──────────────────────────────────────── */
+.card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+  padding: 26px;
+  margin-bottom: 20px;
+}
+.light .card { background: rgba(255,255,255,.88); }
+
+/* ─── TOOLBAR ─────────────────────────────────────────── */
+.toolbar { display:flex; flex-wrap:wrap; gap:9px; margin-bottom:18px; align-items:center; }
+
+.tb-select, .tb-btn {
+  font-family:'DM Sans',sans-serif; font-size:13px;
+  padding:8px 14px; border-radius:10px; border:1px solid var(--border);
+  cursor:pointer; transition:all .2s;
+}
+.tb-select {
+  background:var(--surface); color:var(--text);
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2300e5ff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center;
+  padding-right:30px;
+}
+.tb-select:focus { outline:none; border-color:var(--cyan); }
+.tb-select option { background:#111827; color:#e8eef8; }
+.light .tb-select option { background:#fff; color:#0d1117; }
+
+.tb-btn {
+  background:var(--surface); color:var(--muted); font-weight:500;
+}
+.tb-btn:hover { background:var(--glass); color:var(--text); border-color:var(--cyan); transform:translateY(-1px); }
+.tb-btn.primary {
+  background:linear-gradient(135deg,var(--cyan),var(--teal)); color:#080c14; font-weight:600;
+  border-color:transparent; box-shadow:0 4px 18px rgba(0,229,255,.25);
+}
+.tb-btn.primary:hover { box-shadow:0 6px 24px rgba(0,229,255,.4); transform:translateY(-2px); }
+
+/* ─── TEXTAREA ────────────────────────────────────────── */
+.main-textarea {
+  width:100%; min-height:230px; padding:16px;
+  border-radius:12px; border:1px solid var(--border);
+  resize:vertical; font-size:15px; line-height:1.7;
+  font-family:'DM Sans',sans-serif;
+  background:rgba(0,0,0,0.25); color:var(--text);
+  transition: border-color .2s, box-shadow .2s;
+}
+.light .main-textarea { background:rgba(0,0,0,0.04); }
+.main-textarea:focus { outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(0,229,255,.12); }
+.main-textarea::placeholder { color:var(--muted); }
+
+/* ─── STATS ROW ───────────────────────────────────────── */
+.stats-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
+.stat-pill {
+  flex:1; min-width:100px; text-align:center;
+  padding:14px 10px; border-radius:14px;
+  background:var(--surface); border:1px solid var(--border);
+  transition:transform .2s, box-shadow .2s;
+}
+.stat-pill:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,229,255,.12); }
+.stat-pill .val {
+  display:block; font-family:'Syne',sans-serif; font-size:26px; font-weight:700;
+  background:linear-gradient(135deg,var(--cyan),var(--teal));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.stat-pill .lbl { display:block; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:3px; }
+
+/* ─── DUPLICATE TABLE ─────────────────────────────────── */
+.dup-header { display:flex; align-items:center; gap:10px; margin-top:22px; margin-bottom:12px; }
+.dup-header span { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; }
+.dup-badge {
+  background:var(--amber); color:#080c14; font-size:11px; font-weight:700;
+  padding:2px 9px; border-radius:20px;
+}
+.dup-table-wrap { overflow-x:auto; border-radius:12px; border:1px solid var(--border); }
+.dup-table { width:100%; border-collapse:collapse; font-size:13px; }
+.dup-table thead th {
+  padding:10px 14px; text-align:left;
+  background:rgba(0,229,255,0.08); color:var(--cyan);
+  font-size:11px; text-transform:uppercase; letter-spacing:1px; font-weight:600;
+}
+.dup-table tbody td { padding:9px 14px; border-top:1px solid var(--border); color:var(--text); }
+.dup-table tbody tr:hover td { background:rgba(0,229,255,0.04); }
+
+/* ─── COPY TOOLTIP ────────────────────────────────────── */
+.copy-tip {
+  position:fixed; bottom:30px; right:30px; z-index:999;
+  background:linear-gradient(135deg,var(--teal),var(--cyan));
+  color:#080c14; font-weight:600; font-size:13px;
+  padding:10px 20px; border-radius:30px;
+  box-shadow:0 8px 28px rgba(0,229,255,.4);
+  opacity:0; transform:translateY(10px);
+  transition:all .3s ease; pointer-events:none;
+}
+.copy-tip.show { opacity:1; transform:translateY(0); }
+
+/* ─── GST CALCULATOR ──────────────────────────────────── */
+.gst-mode-row { display:flex; gap:0; margin-bottom:22px; background:var(--surface); border-radius:12px; border:1px solid var(--border); padding:4px; width:fit-content; }
+.gst-mode-btn {
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+  padding:8px 20px; border-radius:9px; border:none; cursor:pointer;
+  background:transparent; color:var(--muted); transition:all .22s;
+}
+.gst-mode-btn.active {
+  background:linear-gradient(135deg,var(--cyan),var(--teal)); color:#080c14; font-weight:700;
+  box-shadow:0 4px 14px rgba(0,229,255,.3);
+}
+.gst-mode-hint { font-size:12px; color:var(--muted); margin-bottom:18px; padding:10px 14px; border-radius:10px; background:rgba(0,229,255,.05); border:1px solid rgba(0,229,255,.12); }
+.gst-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:540px){.gst-grid{grid-template-columns:1fr;}}
+.field-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; font-weight:600; }
+.gst-input {
+  width:100%; padding:12px 16px; border-radius:12px; border:1px solid var(--border);
+  background:rgba(0,0,0,0.25); color:var(--text); font-size:15px;
+  font-family:'DM Sans',sans-serif; transition:border-color .2s,box-shadow .2s;
+}
+.light .gst-input { background:rgba(0,0,0,0.04); }
+.gst-input:focus { outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(0,229,255,.12); }
+.gst-input::placeholder { color:var(--muted); }
+.gst-select {
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+  background:rgba(0,0,0,0.25); color:var(--text); font-size:14px;
+  font-family:'DM Sans',sans-serif; appearance:none; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2300e5ff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 12px center;
+  transition:border-color .2s;
+}
+.light .gst-select { background-color:rgba(0,0,0,0.04); }
+.gst-select:focus { outline:none; border-color:var(--cyan); }
+.gst-select option { background:#111827; }
+.light .gst-select option { background:#fff; color:#0d1117; }
+.gst-calc-btn {
+  grid-column:1/-1; width:100%; padding:14px;
+  font-family:'Syne',sans-serif; font-size:15px; font-weight:700;
+  border:none; border-radius:12px; cursor:pointer;
+  background:linear-gradient(135deg,var(--cyan),var(--teal));
+  color:#080c14; letter-spacing:.5px;
+  box-shadow:0 6px 22px rgba(0,229,255,.28);
+  transition:all .25s;
+}
+.gst-calc-btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(0,229,255,.4); }
+
+.gst-result { grid-column:1/-1; }
+.result-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; }
+.result-tile {
+  padding:18px; border-radius:14px; border:1px solid var(--border);
+  background:var(--surface); text-align:center;
+}
+.result-tile .r-lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+.result-tile .r-val { font-family:'Syne',sans-serif; font-size:22px; font-weight:700; margin-top:5px; color:var(--text); }
+.result-tile.total { background:linear-gradient(135deg,rgba(0,229,255,.12),rgba(0,191,174,.12)); border-color:rgba(0,229,255,.3); }
+.result-tile.total .r-val { background:linear-gradient(135deg,var(--cyan),var(--teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; font-size:26px; }
+
+/* ─── FILE SEARCH ─────────────────────────────────────── */
+.fs-controls { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; align-items:center; }
+.fs-file-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:9px 18px; border-radius:12px; border:1.5px dashed var(--border);
+  background:var(--surface); color:var(--muted); font-size:13px; font-weight:500;
+  cursor:pointer; transition:all .2s; white-space:nowrap;
+}
+.fs-file-btn:hover { border-color:var(--cyan); color:var(--text); }
+.fs-file-btn input { display:none; }
+.fs-search {
+  flex:1; min-width:180px; padding:10px 16px; border-radius:12px; border:1px solid var(--border);
+  background:rgba(0,0,0,.22); color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif;
+  transition:border-color .2s,box-shadow .2s;
+}
+.light .fs-search { background:rgba(0,0,0,.04); }
+.fs-search:focus { outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(0,229,255,.1); }
+.fs-search::placeholder { color:var(--muted); }
+.fs-search:disabled { opacity:.4; }
+.fs-select {
+  padding:10px 32px 10px 14px; border-radius:12px; border:1px solid var(--border);
+  background:rgba(0,0,0,.22); color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2300e5ff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center;
+  cursor:pointer; transition:border-color .2s;
+}
+.light .fs-select { background-color:rgba(0,0,0,.04); }
+.fs-select:focus { outline:none; border-color:var(--cyan); }
+.fs-select:disabled { opacity:.4; }
+.fs-select option { background:#111827; color:#e8eef8; }
+.light .fs-select option { background:#fff; color:#0d1117; }
+
+.fs-meta { font-size:12px; color:var(--muted); margin-bottom:16px; display:flex; gap:16px; }
+.fs-meta span { display:inline-flex; align-items:center; gap:5px; }
+
+.file-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:14px; margin-bottom:28px; }
+.file-card {
+  background:var(--glass); border:1px solid var(--border); border-radius:14px;
+  padding:16px; cursor:pointer;
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+  backdrop-filter:blur(12px);
+}
+.file-card:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,229,255,.12); border-color:rgba(0,229,255,.25); }
+.fc-row { display:flex; align-items:flex-start; gap:12px; }
+.fc-icon { font-size:28px; flex-shrink:0; line-height:1.2; }
+.fc-name { font-weight:600; font-size:14px; word-break:break-all; line-height:1.4; }
+.fc-path { font-size:11px; color:var(--muted); margin-top:2px; word-break:break-all; }
+.fc-footer { display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid var(--border); }
+.fc-size { font-size:12px; color:var(--muted); }
+.fc-date { font-size:11px; color:var(--muted); }
+.fc-dl {
+  font-size:11px; font-weight:600; padding:5px 12px; border-radius:8px; border:none;
+  background:linear-gradient(135deg,var(--teal),var(--cyan)); color:#080c14; cursor:pointer;
+  transition:all .2s;
+}
+.fc-dl:hover { transform:scale(1.06); box-shadow:0 4px 14px rgba(0,229,255,.3); }
+.highlight { background:rgba(255,181,71,.25); color:var(--amber); border-radius:3px; padding:0 2px; }
+
+.chart-card { margin-top:10px; }
+.chart-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--muted); margin-bottom:14px; text-transform:uppercase; letter-spacing:1px; }
+#sizeChart { width:100% !important; display:block; border-radius:8px; }
+
+/* ─── EMPTY STATE ─────────────────────────────────────── */
+.empty-state { text-align:center; padding:60px 20px; color:var(--muted); }
+.empty-state .es-icon { font-size:56px; margin-bottom:14px; filter:grayscale(.4); }
+.empty-state p { font-size:15px; }
+
+/* ─── SCROLLBAR ───────────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(0,229,255,.25);border-radius:10px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,229,255,.45);}
 </style>
 </head>
-<body class="light">
+<body>
 
-<nav class="top-nav">
-  <div class="logo">ToolBox</div>
-  <div class="menu">
-    <a onclick="switchPage('char-counter', this)" class="active">Character Counter</a>
-    <a onclick="switchPage('gst-calculator', this)">GST Calculator</a>
-    <a onclick="switchPage('file-search', this)">Local File Search</a>
+<!-- Ambient orbs -->
+<div class="orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">⬡ ToolBox</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchPage('char-counter',this)">Character Counter</button>
+    <button class="nav-tab" onclick="switchPage('gst-calculator',this)">GST Calculator</button>
+    <button class="nav-tab" onclick="switchPage('file-search',this)">File Search</button>
   </div>
-  <button onclick="toggleTheme()">Dark / Light</button>
+  <button class="nav-theme" onclick="toggleTheme()" title="Toggle theme">☀</button>
 </nav>
 
-<!-- Character Counter -->
+<!-- COPY TOOLTIP -->
+<div class="copy-tip" id="copyTip">✓ Copied to clipboard</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 1 · CHARACTER COUNTER
+════════════════════════════════════════════════════ -->
 <section id="char-counter" class="page active">
-<div class="app-container">
-<h2>Character Counter</h2>
-<div class="toolbar">
-  <select id="caseSelect">
-    <option value="sentence">Sentence case</option>
-    <option value="lower">lowercase</option>
-    <option value="upper">UPPERCASE</option>
-    <option value="capital">Capitalize Each Word</option>
-    <option value="toggle">tOGGLE cASE</option>
-  </select>
-  <button id="clearBtn">Clear</button>
-  <button onclick="undoText()">↶ Undo</button>
-  <button onclick="redoText()">↷ Redo</button>
-  <button id="copyBtn">Copy</button>
-  <select id="downloadFormat">
-    <option value="txt">Text (.txt)</option>
-    <option value="pdf">PDF (.pdf)</option>
-    <option value="doc">Word (.docx)</option>
-    <option value="xlsx">Excel (.xlsx)</option>
-  </select>
-  <button id="downloadBtn">Download</button>
-  <span id="copyTooltip" class="copy-tooltip">Copied!</span>
-</div>
-<textarea id="textInput" placeholder="Type your text here..."></textarea>
-<div class="stats-bar">
-  <span>Chars: <b id="s_chars">0</b></span>
-  <span>Words: <b id="s_words">0</b></span>
-  <span>Sentences: <b id="s_sent">0</b></span>
-  <span>Paragraphs: <b id="s_para">0</b></span>
-  <span>Spaces: <b id="s_space">0</b></span>
-</div>
-<div class="duplicates-panel">
-  <span>Duplicate Words: <b id="dup_count">0</b></span>
-  <div class="dup-table-wrapper">
-    <table id="dup_table"><thead><tr><th>Word</th><th>Count</th></tr></thead><tbody><tr><td colspan="2">No duplicates</td></tr></tbody></table>
+  <div class="section-header">
+    <h2 class="section-title">Character Counter</h2>
+    <span class="section-badge">Text Tools</span>
   </div>
-</div>
-</div>
+
+  <div class="card">
+    <div class="toolbar">
+      <select class="tb-select" id="caseSelect">
+        <option value="sentence">Sentence case</option>
+        <option value="lower">lowercase</option>
+        <option value="upper">UPPERCASE</option>
+        <option value="capital">Capitalize Each Word</option>
+        <option value="toggle">tOGGLE cASE</option>
+      </select>
+      <button class="tb-btn" id="clearBtn">✕ Clear</button>
+      <button class="tb-btn" onclick="undoText()">↶ Undo</button>
+      <button class="tb-btn" onclick="redoText()">↷ Redo</button>
+      <button class="tb-btn primary" id="copyBtn">⎘ Copy</button>
+      <select class="tb-select" id="downloadFormat">
+        <option value="txt">Text (.txt)</option>
+        <option value="pdf">PDF (.pdf)</option>
+        <option value="doc">Word (.docx)</option>
+        <option value="xlsx">Excel (.xlsx)</option>
+      </select>
+      <button class="tb-btn primary" id="downloadBtn">↓ Download</button>
+    </div>
+    <textarea class="main-textarea" id="textInput" placeholder="Start typing or paste your text here…"></textarea>
+    <div class="stats-row">
+      <div class="stat-pill"><span class="val" id="s_chars">0</span><span class="lbl">Chars</span></div>
+      <div class="stat-pill"><span class="val" id="s_words">0</span><span class="lbl">Words</span></div>
+      <div class="stat-pill"><span class="val" id="s_sent">0</span><span class="lbl">Sentences</span></div>
+      <div class="stat-pill"><span class="val" id="s_para">0</span><span class="lbl">Paragraphs</span></div>
+      <div class="stat-pill"><span class="val" id="s_space">0</span><span class="lbl">Spaces</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="dup-header">
+      <span>Duplicate Words</span>
+      <span class="dup-badge" id="dup_count">0</span>
+    </div>
+    <div class="dup-table-wrap">
+      <table class="dup-table">
+        <thead><tr><th>Word</th><th>Occurrences</th></tr></thead>
+        <tbody id="dup_tbody"><tr><td colspan="2" style="color:var(--muted);padding:14px;">No duplicates found.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 </section>
 
-<!-- GST Calculator -->
+<!-- ═══════════════════════════════════════════════════
+     PAGE 2 · GST CALCULATOR
+════════════════════════════════════════════════════ -->
 <section id="gst-calculator" class="page">
-<div class="app-container gst-box">
-<h2>GST Calculator</h2>
-<input id="total" type="number" placeholder="Total Amount (GST Included)">
-<select id="percent">
-  <option value="5">5%</option>
-  <option value="12">12%</option>
-  <option value="18">18%</option>
-  <option value="28">28%</option>
-</select>
-<select id="type">
-  <option value="sc">SGST + CGST</option>
-  <option value="ig">IGST</option>
-</select>
-<button onclick="gst()">Calculate</button>
-<div id="result"></div>
-</div>
+  <div class="section-header">
+    <h2 class="section-title">GST Calculator</h2>
+    <span class="section-badge">Finance</span>
+  </div>
+
+  <div class="card">
+    <!-- Mode toggle -->
+    <div class="gst-mode-row">
+      <button class="gst-mode-btn active" id="modeExtract" onclick="setMode('extract')">⬇ Extract Base from Total</button>
+      <button class="gst-mode-btn" id="modeAdd"     onclick="setMode('add')">⬆ Add Tax to Base</button>
+    </div>
+    <div class="gst-mode-hint" id="modeHint">
+      Enter the <strong>total amount (GST included)</strong> — the base price and tax breakdown will be extracted.
+    </div>
+
+    <div class="gst-grid">
+      <div>
+        <div class="field-label" id="amountLabel">Total Amount (GST Included)</div>
+        <input class="gst-input" id="total" type="number" placeholder="e.g. 1180">
+      </div>
+      <div>
+        <div class="field-label">GST Rate</div>
+        <select class="gst-select" id="percent">
+          <option value="3">3%</option>
+          <option value="5">5%</option>
+          <option value="12">12%</option>
+          <option value="18" selected>18%</option>
+          <option value="28">28%</option>
+        </select>
+      </div>
+      <div>
+        <div class="field-label">Tax Type</div>
+        <select class="gst-select" id="type">
+          <option value="sc">SGST + CGST (Intra-state)</option>
+          <option value="ig">IGST (Inter-state)</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:flex-end;">
+        <button class="gst-calc-btn" onclick="calcGST()" style="margin:0;">Calculate GST →</button>
+      </div>
+      <div class="gst-result" id="gst-result"></div>
+    </div>
+  </div>
 </section>
 
-<!-- Local File Search -->
+<!-- ═══════════════════════════════════════════════════
+     PAGE 3 · LOCAL FILE SEARCH
+════════════════════════════════════════════════════ -->
 <section id="file-search" class="page">
-<h1>Advanced Local File Search</h1>
-<div id="folderPath">No folder selected</div>
-<div id="fileCount"></div>
-<div id="controls">
-  <input type="file" id="folderInput" webkitdirectory multiple>
-  <input type="text" id="searchBox" placeholder="Search files..." disabled>
-  <select id="fileType" disabled>
+  <div class="section-header">
+    <h2 class="section-title">Local File Search</h2>
+    <span class="section-badge">Explorer</span>
+  </div>
+
+  <div class="card">
+    <div class="fs-controls">
+      <label class="fs-file-btn">
+        <span>📁</span> Choose Folder
+        <input type="file" id="folderInput" webkitdirectory multiple>
+      </label>
+      <input type="text" class="fs-search" id="searchBox" placeholder="Search by name or path…" disabled>
+      <select class="fs-select" id="fileType" disabled>
         <option value="">All types</option>
         <option value=".txt">TXT</option>
         <option value=".pdf">PDF</option>
@@ -244,7 +507,7 @@ small{font-size:12px;opacity:.8}
         <option value=".html">HTML</option>
         <option value=".css">CSS</option>
         <option value=".xlsx">XLSX</option>
-        <option value=".docs">DOCS</option>
+        <option value=".docx">DOCX</option>
         <option value=".exe">EXE</option>
         <option value=".jpg">JPG</option>
         <option value=".png">PNG</option>
@@ -255,181 +518,308 @@ small{font-size:12px;opacity:.8}
         <option value=".plt">PLT</option>
         <option value=".ezd">EZD</option>
         <option value=".btw">BTW</option>
-    </select>
-  <select id="sortBy" disabled>
-    <option value="date">Date</option>
-    <option value="name">Name</option>
-    <option value="size">Size</option>
-  </select>
-  <select id="sortOrder" disabled>
-    <option value="desc">Desc</option>
-    <option value="asc">Asc</option>
-  </select>
-  <button onclick="updateResults()">Search</button>
-</div>
-<div id="results"></div>
-<div id="chartWrap"><canvas id="sizeChart" height="160"></canvas></div>
+      </select>
+      <select class="fs-select" id="sortBy" disabled>
+        <option value="date">Sort: Date</option>
+        <option value="name">Sort: Name</option>
+        <option value="size">Sort: Size</option>
+      </select>
+      <select class="fs-select" id="sortOrder" disabled>
+        <option value="desc">↓ Desc</option>
+        <option value="asc">↑ Asc</option>
+      </select>
+      <button class="tb-btn primary" onclick="updateResults()">Search</button>
+    </div>
+    <div class="fs-meta" id="fsMeta" style="display:none;">
+      <span>📂 <span id="folderName">—</span></span>
+      <span>🗂 <span id="fileCountLabel">0 files</span></span>
+    </div>
+  </div>
+
+  <div class="file-grid" id="fileGrid">
+    <div class="empty-state" style="grid-column:1/-1;">
+      <div class="es-icon">📂</div>
+      <p>Select a folder above to explore your files.</p>
+    </div>
+  </div>
+
+  <div class="card chart-card" id="chartCard" style="display:none;">
+    <div class="chart-title">File Size Distribution</div>
+    <canvas id="sizeChart" height="140"></canvas>
+  </div>
 </section>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-/* === PAGE SWITCHING === */
+/* ═══ PAGE SWITCH ════════════════════════════════════ */
 function switchPage(id, el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.menu a').forEach(a=>a.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
 }
 
-/* === DARK/LIGHT THEME === */
-function toggleTheme(){ document.body.classList.toggle('light'); localStorage.setItem('theme', document.body.className);}
-document.body.className = localStorage.getItem('theme') || "dark";
+/* ═══ THEME ══════════════════════════════════════════ */
+function toggleTheme(){
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  document.querySelector('.nav-theme').textContent = isLight ? '🌙' : '☀';
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+}
+if(localStorage.getItem('theme') === 'light'){
+  document.body.classList.add('light');
+  document.querySelector('.nav-theme').textContent = '🌙';
+}
 
-/* === CHARACTER COUNTER FUNCTIONS === */
+/* ═══ CHARACTER COUNTER ══════════════════════════════ */
 let undoStack=[], redoStack=[];
-const txt=document.getElementById("textInput");
-const sel=document.getElementById("caseSelect");
-const charBox=document.getElementById("s_chars");
-const s_words=document.getElementById("s_words");
-const s_sent=document.getElementById("s_sent");
-const s_para=document.getElementById("s_para");
-const s_space=document.getElementById("s_space");
-const dup_count=document.getElementById("dup_count");
-const dup_table=document.getElementById("dup_table").querySelector("tbody");
+const txt = document.getElementById('textInput');
 
-function saveState(){ undoStack.push(txt.value); if(undoStack.length>100) undoStack.shift(); }
+function saveState(){ undoStack.push(txt.value); if(undoStack.length>100) undoStack.shift(); redoStack=[]; }
 function undoText(){ if(!undoStack.length) return; redoStack.push(txt.value); txt.value=undoStack.pop(); updateStats(); }
 function redoText(){ if(!redoStack.length) return; undoStack.push(txt.value); txt.value=redoStack.pop(); updateStats(); }
-txt.addEventListener("input",()=>{ saveState(); updateStats(); });
 
-function sentenceCase(t){ t=t.toLowerCase(); return t.replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g,m=>m.toUpperCase()); }
-function lower(t){ return t.toLowerCase(); }
-function upper(t){ return t.toUpperCase(); }
+txt.addEventListener('input', ()=>{ saveState(); updateStats(); });
+
+document.getElementById('clearBtn').addEventListener('click', ()=>{ saveState(); txt.value=''; updateStats(); });
+
+document.getElementById('caseSelect').addEventListener('change', ()=>{
+  saveState(); txt.value = applyCase(txt.value); updateStats();
+});
+
+function sentenceCase(t){ return t.toLowerCase().replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g,m=>m.toUpperCase()); }
 function capital(t){ return t.replace(/\b(\w)(\w*)/g,(_,a,b)=>a.toUpperCase()+b.toLowerCase()); }
-function toggleCase(t){ return t.split("").map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join(""); }
-function applyCase(text){ switch(sel.value){ case"sentence":return sentenceCase(text); case"lower":return lower(text); case"upper":return upper(text); case"capital":return capital(text); case"toggle":return toggleCase(text);} return text; }
+function toggleCase(t){ return t.split('').map(c=>c===c.toUpperCase()?c.toLowerCase():c.toUpperCase()).join(''); }
+function applyCase(t){
+  const v = document.getElementById('caseSelect').value;
+  return v==='sentence'?sentenceCase(t):v==='lower'?t.toLowerCase():v==='upper'?t.toUpperCase():v==='capital'?capital(t):v==='toggle'?toggleCase(t):t;
+}
 
 function updateStats(){
-  const t=txt.value;
-  s_chars.textContent=t.length;
-  s_words.textContent=t.trim()? t.trim().split(/\s+/).length:0;
-  s_sent.textContent=t.split(/[.!?]+/).filter(Boolean).length;
-  s_para.textContent=t.split(/\n+/).filter(Boolean).length;
-  s_space.textContent=(t.match(/ /g)||[]).length;
+  const t = txt.value;
+  document.getElementById('s_chars').textContent  = t.length;
+  document.getElementById('s_words').textContent  = t.trim() ? t.trim().split(/\s+/).length : 0;
+  document.getElementById('s_sent').textContent   = t.split(/[.!?]+/).filter(Boolean).length;
+  document.getElementById('s_para').textContent   = t.split(/\n+/).filter(Boolean).length;
+  document.getElementById('s_space').textContent  = (t.match(/ /g)||[]).length;
   updateDuplicates(t);
 }
 
 function updateDuplicates(text){
-  const words=text.toLowerCase().match(/\b\w+\b/g)||[];
-  const counts={}; words.forEach(w=>counts[w]=(counts[w]||0)+1);
-  const duplicates=Object.keys(counts).filter(k=>counts[k]>1);
-  dup_count.textContent=duplicates.length;
-  dup_table.innerHTML="";
-  if(duplicates.length){ duplicates.forEach(w=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${w}</td><td>${counts[w]}</td>`; dup_table.appendChild(tr); }); }
-  else{ dup_table.innerHTML=`<tr><td colspan="2">No duplicates</td></tr>`; }
+  const words = text.toLowerCase().match(/\b\w+\b/g)||[];
+  const counts = {}; words.forEach(w=>counts[w]=(counts[w]||0)+1);
+  const dups = Object.keys(counts).filter(k=>counts[k]>1);
+  document.getElementById('dup_count').textContent = dups.length;
+  const tbody = document.getElementById('dup_tbody');
+  if(!dups.length){
+    tbody.innerHTML = `<tr><td colspan="2" style="color:var(--muted);padding:14px;">No duplicates found.</td></tr>`;
+  } else {
+    tbody.innerHTML = dups.sort((a,b)=>counts[b]-counts[a])
+      .map(w=>`<tr><td>${w}</td><td style="font-family:'Syne',sans-serif;font-weight:700;color:var(--cyan)">${counts[w]}</td></tr>`)
+      .join('');
+  }
 }
 
-/* COPY & DOWNLOAD */
-document.getElementById("copyBtn").addEventListener("click",()=>{
-    navigator.clipboard.writeText(txt.value).then(()=>{
-        const tooltip=document.getElementById("copyTooltip");
-        tooltip.classList.add("show");
-        setTimeout(()=>tooltip.classList.remove("show"),2000);
-    });
+document.getElementById('copyBtn').addEventListener('click', ()=>{
+  navigator.clipboard.writeText(txt.value).then(()=>{
+    const tip = document.getElementById('copyTip');
+    tip.classList.add('show');
+    setTimeout(()=>tip.classList.remove('show'), 2200);
+  });
 });
-document.getElementById("downloadBtn").addEventListener("click",()=>{
-    const text=txt.value;
-    const format=document.getElementById("downloadFormat").value;
-    if(format==="txt"){ const blob=new Blob([text],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="text.txt"; a.click();}
-    else if(format==="pdf"){ const { jsPDF }=window.jspdf; const doc=new jsPDF(); const lines=doc.splitTextToSize(text,180); doc.text(lines,10,10); doc.save("text.pdf");}
-    else if(format==="doc"){ const blob=new Blob([text],{type:"application/msword"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="text.doc"; a.click();}
-    else if(format==="xlsx"){ const ws=XLSX.utils.aoa_to_sheet(text.split(/\n/).map(l=>[l])); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Sheet1"); XLSX.writeFile(wb,"text.xlsx");}
-});
-sel.addEventListener("change",()=>{ txt.value=applyCase(txt.value); updateStats(); });
 
-/* GST CALCULATOR */
-function gst(){
-    let T=+document.getElementById("total").value;
-    let P=+document.getElementById("percent").value;
-    let type=document.getElementById("type").value;
-    if(!T) return;
-    let base=T/(1+P/100), tax=T-base;
-    document.getElementById("result").innerHTML=
-        `Base: ₹${base.toFixed(2)}<br>`+
-        (type==="sc"?`SGST: ₹${(tax/2).toFixed(2)}<br>CGST: ₹${(tax/2).toFixed(2)}`:`IGST: ₹${tax.toFixed(2)}`)+
-        `<br><b>Total: ₹${T.toFixed(2)}</b>`;
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  const text = txt.value;
+  const fmt = document.getElementById('downloadFormat').value;
+  if(fmt==='txt'){
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'})); a.download='text.txt'; a.click();
+  } else if(fmt==='pdf'){
+    const {jsPDF}=window.jspdf; const doc=new jsPDF(); doc.text(doc.splitTextToSize(text,180),10,10); doc.save('text.pdf');
+  } else if(fmt==='doc'){
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'application/msword'})); a.download='text.doc'; a.click();
+  } else if(fmt==='xlsx'){
+    const ws=XLSX.utils.aoa_to_sheet(text.split(/\n/).map(l=>[l]));
+    const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Sheet1'); XLSX.writeFile(wb,'text.xlsx');
+  }
+});
+
+/* ═══ GST CALCULATOR ═════════════════════════════════ */
+let gstMode = 'extract'; // 'extract' = find base from total | 'add' = add tax to base
+
+function setMode(mode){
+  gstMode = mode;
+  document.getElementById('modeExtract').classList.toggle('active', mode==='extract');
+  document.getElementById('modeAdd').classList.toggle('active', mode==='add');
+  const inp = document.getElementById('total');
+  if(mode === 'extract'){
+    document.getElementById('amountLabel').textContent = 'Total Amount (GST Included)';
+    document.getElementById('modeHint').innerHTML = 'Enter the <strong>total amount (GST included)</strong> — the base price and tax breakdown will be extracted.';
+    inp.placeholder = 'e.g. 1180';
+  } else {
+    document.getElementById('amountLabel').textContent = 'Base Amount (Before GST)';
+    document.getElementById('modeHint').innerHTML = 'Enter the <strong>base price (before GST)</strong> — the tax and final total will be calculated.';
+    inp.placeholder = 'e.g. 1000';
+  }
+  document.getElementById('gst-result').innerHTML = '';
+  inp.value = '';
 }
 
-/* === LOCAL FILE SEARCH FUNCTIONS === */
-let filesData=[];
-const folderInput2=document.getElementById("folderInput");
-const searchBox2=document.getElementById("searchBox");
-const fileType2=document.getElementById("fileType");
-const sortBy2=document.getElementById("sortBy");
-const sortOrder2=document.getElementById("sortOrder");
-const folderPath2=document.getElementById("folderPath");
-const fileCount2=document.getElementById("fileCount");
-const results2=document.getElementById("results");
-const sizeChart2=document.getElementById("sizeChart");
+function calcGST(){
+  const val  = +document.getElementById('total').value;
+  const P    = +document.getElementById('percent').value;
+  const type = document.getElementById('type').value;
+  if(!val){ document.getElementById('gst-result').innerHTML=''; return; }
 
-const esc=t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
-const highlight2=(t,k)=>k?t.replace(new RegExp(`(${esc(k)})`,"gi"),`<span class="highlight">$1</span>`):t;
-const sizeFmt=b=>b>1048576?(b/1048576).toFixed(1)+" MB":(b/1024).toFixed(1)+" KB";
-const icon=n=>/pdf/i.test(n)?"📕":/jpg|png|jpeg|gif/i.test(n)?"🖼️":/exe/i.test(n)?"⚙️":"📄";
+  let base, total, tax;
+  if(gstMode === 'extract'){
+    // Given total (inclusive), find base
+    total = val;
+    base  = total / (1 + P/100);
+    tax   = total - base;
+  } else {
+    // Given base, find total
+    base  = val;
+    tax   = base * (P/100);
+    total = base + tax;
+  }
 
-folderInput2.onchange=e=>{
-    filesData=[];
-    const f=e.target.files;
-    if(!f.length) return;
-    folderPath2.innerText="Selected Folder: "+f[0].webkitRelativePath.split("/")[0];
-    for(let x of f){ filesData.push({file:x,name:x.name,path:x.webkitRelativePath,size:x.size,lastModified:x.lastModified}); }
-    searchBox2.disabled=fileType2.disabled=sortBy2.disabled=sortOrder2.disabled=false;
+  // For 3% rate: 1.5+1.5 SGST/CGST or 3 IGST
+  const halfRate = P/2;
+
+  let html = `<div class="result-cards">
+    <div class="result-tile">
+      <div class="r-lbl">Base Amount</div>
+      <div class="r-val">₹${base.toFixed(2)}</div>
+    </div>`;
+
+  if(type === 'sc'){
+    html += `
+    <div class="result-tile">
+      <div class="r-lbl">SGST @ ${halfRate}%</div>
+      <div class="r-val">₹${(tax/2).toFixed(2)}</div>
+    </div>
+    <div class="result-tile">
+      <div class="r-lbl">CGST @ ${halfRate}%</div>
+      <div class="r-val">₹${(tax/2).toFixed(2)}</div>
+    </div>`;
+  } else {
+    html += `
+    <div class="result-tile">
+      <div class="r-lbl">IGST @ ${P}%</div>
+      <div class="r-val">₹${tax.toFixed(2)}</div>
+    </div>`;
+  }
+
+  html += `
+    <div class="result-tile">
+      <div class="r-lbl">Total Tax</div>
+      <div class="r-val">₹${tax.toFixed(2)}</div>
+    </div>
+    <div class="result-tile total">
+      <div class="r-lbl">Grand Total</div>
+      <div class="r-val">₹${total.toFixed(2)}</div>
+    </div>
+  </div>`;
+
+  document.getElementById('gst-result').innerHTML = html;
+}
+
+/* ═══ FILE SEARCH ════════════════════════════════════ */
+let filesData = [];
+const folderInput = document.getElementById('folderInput');
+const searchBox  = document.getElementById('searchBox');
+const fileType   = document.getElementById('fileType');
+const sortBy     = document.getElementById('sortBy');
+const sortOrder  = document.getElementById('sortOrder');
+const fileGrid   = document.getElementById('fileGrid');
+const chartCard  = document.getElementById('chartCard');
+
+const esc2 = t => t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const hilite = (t,k) => k ? t.replace(new RegExp(`(${esc2(k)})`,'gi'),'<span class="highlight">$1</span>') : t;
+const fmtSize = b => b>1048576?(b/1048576).toFixed(1)+' MB':(b/1024).toFixed(1)+' KB';
+const fileIcon = n => /pdf/i.test(n)?'📕':/jpg|png|jpeg|gif|webp/i.test(n)?'🖼️':/exe/i.test(n)?'⚙️':/xlsx?/i.test(n)?'📊':/docx?/i.test(n)?'📝':/js|html|css/i.test(n)?'🧩':'📄';
+
+folderInput.onchange = e => {
+  filesData = [];
+  const f = e.target.files;
+  if(!f.length) return;
+  document.getElementById('folderName').textContent = f[0].webkitRelativePath.split('/')[0];
+  document.getElementById('fsMeta').style.display = 'flex';
+  for(let x of f) filesData.push({file:x,name:x.name,path:x.webkitRelativePath,size:x.size,lastModified:x.lastModified});
+  searchBox.disabled=fileType.disabled=sortBy.disabled=sortOrder.disabled=false;
+  updateResults();
 };
-searchBox2.oninput=updateResults;
+searchBox.oninput = updateResults;
 
 function updateResults(){
-    const key=searchBox2.value.toLowerCase();
-    let list=[...filesData];
-    if(key) list=list.filter(f=>f.name.toLowerCase().includes(key)||f.path.toLowerCase().includes(key));
-    if(fileType2.value) list=list.filter(f=>f.name.endsWith(fileType2.value));
-    list.sort((a,b)=>{
-        let v=sortBy2.value==="name"?a.name.localeCompare(b.name):
-              sortBy2.value==="size"?a.size-b.size:
-              a.lastModified-b.lastModified;
-        return sortOrder2.value==="asc"?v:-v;
-    });
-    fileCount2.innerText="Total Files: "+list.length;
-    results2.innerHTML="";
-    list.forEach(f=>{
-        const card=document.createElement("div");
-        card.className="result-card";
-        card.ondblclick=()=>window.open(URL.createObjectURL(f.file));
-        card.innerHTML=`
-        <div class="file-row">
-            <div class="icon">${icon(f.name)}</div>
-            <div><strong>${highlight2(f.name,key)}</strong><br><small>${highlight2(f.path,key)}</small></div>
-        </div>
-        <div class="action-row">
-            <span>${sizeFmt(f.size)}</span>
-            <span>${new Date(f.lastModified).toLocaleString()}</span>
-            <button class="download-btn">Download</button>
-        </div>`;
-        card.querySelector(".download-btn").onclick=e=>{ e.stopPropagation(); const a=document.createElement("a"); a.href=URL.createObjectURL(f.file); a.download=f.name; a.click();};
-        results2.appendChild(card);
-    });
-    drawChart(list);
+  const key = searchBox.value.toLowerCase();
+  let list = [...filesData];
+  if(key) list = list.filter(f=>f.name.toLowerCase().includes(key)||f.path.toLowerCase().includes(key));
+  if(fileType.value) list = list.filter(f=>f.name.endsWith(fileType.value));
+  list.sort((a,b)=>{
+    const v = sortBy.value==='name'?a.name.localeCompare(b.name):sortBy.value==='size'?a.size-b.size:a.lastModified-b.lastModified;
+    return sortOrder.value==='asc'?v:-v;
+  });
+  document.getElementById('fileCountLabel').textContent = list.length+' files';
+  fileGrid.innerHTML = '';
+  if(!list.length){
+    fileGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="es-icon">🔍</div><p>No files match your search.</p></div>`;
+    chartCard.style.display='none'; return;
+  }
+  list.forEach(f=>{
+    const card = document.createElement('div');
+    card.className='file-card';
+    card.ondblclick = ()=>window.open(URL.createObjectURL(f.file));
+    card.innerHTML = `
+      <div class="fc-row">
+        <div class="fc-icon">${fileIcon(f.name)}</div>
+        <div><div class="fc-name">${hilite(f.name,key)}</div><div class="fc-path">${hilite(f.path,key)}</div></div>
+      </div>
+      <div class="fc-footer">
+        <span class="fc-size">${fmtSize(f.size)}</span>
+        <span class="fc-date">${new Date(f.lastModified).toLocaleDateString()}</span>
+        <button class="fc-dl">↓ Download</button>
+      </div>`;
+    card.querySelector('.fc-dl').onclick = e=>{
+      e.stopPropagation();
+      const a=document.createElement('a'); a.href=URL.createObjectURL(f.file); a.download=f.name; a.click();
+    };
+    fileGrid.appendChild(card);
+  });
+  drawChart(list);
+  chartCard.style.display='block';
 }
+
 function drawChart(list){
-    const c=sizeChart2,ctx=c.getContext("2d");
-    ctx.clearRect(0,0,c.width,c.height);
-    if(!list.length)return;
-    const max=Math.max(...list.map(f=>f.size));
-    const w=c.width/list.length;
-    list.forEach((f,i)=>{ const h=(f.size/max)*(c.height-20); ctx.fillStyle="#4fc3ff"; ctx.fillRect(i*w,c.height-h,w-3,h); });
+  const canvas = document.getElementById('sizeChart');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 900;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!list.length) return;
+  const max = Math.max(...list.map(f=>f.size));
+  const bw = canvas.width / list.length;
+  const h = canvas.height;
+  list.forEach((f,i)=>{
+    const bh = (f.size/max)*(h-24);
+    const grad = ctx.createLinearGradient(0,h-bh,0,h);
+    grad.addColorStop(0,'#00e5ff');
+    grad.addColorStop(1,'#00bfae');
+    ctx.fillStyle = grad;
+    const x = i*bw, w = Math.max(bw-3,1);
+    const r = Math.min(4, w/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r, h-bh);
+    ctx.lineTo(x+w-r, h-bh);
+    ctx.quadraticCurveTo(x+w, h-bh, x+w, h-bh+r);
+    ctx.lineTo(x+w, h);
+    ctx.lineTo(x, h);
+    ctx.lineTo(x, h-bh+r);
+    ctx.quadraticCurveTo(x, h-bh, x+r, h-bh);
+    ctx.closePath();
+    ctx.fill();
+  });
 }
 </script>
 </body>
 </html>
-
-
